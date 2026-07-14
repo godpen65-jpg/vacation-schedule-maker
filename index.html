@@ -114,16 +114,20 @@
   .modal .row2{display:flex; gap:10px; align-items:center; margin-bottom:16px;}
   .modal-btns{display:flex; gap:10px; justify-content:flex-end;}
 
-  /* ---------- 출력(인쇄 전용, 화면에는 안 보임) ---------- */
+  /* ---------- 출력(미리보기+인쇄) ---------- */
   #previewWrap{margin-top:18px; margin-bottom:18px;}
-  @media screen{
-    #previewWrap{display:none !important;}
-  }
+  #previewWrap h2{color:var(--pink); font-size:17px; margin-bottom:10px;}
   .page{width:297mm; min-height:210mm; background:#fff; margin:0 auto 14px; padding:8mm 10mm;
     box-shadow:0 3px 14px rgba(0,0,0,.12); position:relative; overflow:hidden;}
+  @media screen{
+    .page.hide-screen{display:none;}
+  }
   @media print{
     .page{zoom:1 !important;}
   }
+  .pager{display:flex; align-items:center; gap:10px; flex-wrap:wrap; background:#fff;
+    border:2px solid var(--border-a); border-radius:14px; padding:10px 14px; margin-bottom:12px;}
+  .pager .lbl{font-weight:bold; color:var(--text-dark); font-size:14px; min-width:170px; text-align:center;}
   .rm{margin-left:2mm; color:#E58; font-weight:bold; cursor:pointer; font-size:12px;
     border:1.5px solid #F5C0D2; border-radius:50%; width:6mm; height:6mm; flex:none;
     display:flex; align-items:center; justify-content:center; background:#fff;}
@@ -266,13 +270,15 @@
     <p class="hint">여행, 학교 프로그램, 특강처럼 특정 날짜에만 있는 일정을 넣어요. 월별 달력에는 이 일정들이 표시돼요!</p>
   </section>
 
-  <section id="previewWrap">
-    <div id="calArea"></div>
-    <div id="printArea"></div>
+  <section class="panel no-print">
+    <h2 style="cursor:pointer; user-select:none" onclick="toggleCalEdit()">③ 월별 일정 달력
+      <span class="cal-toggle" id="calEditArrow">▼ 눌러서 열기</span></h2>
+    <div id="calEditBox" style="display:none; margin-top:10px"></div>
+    <p class="hint">날짜 칸을 누르면 그 날 일정을 바로 넣을 수 있어요. 반복 일정은 이모지로만 살짝 보여요.</p>
   </section>
 
   <section class="panel no-print">
-    <h2>③ 일정 카드 만들기</h2>
+    <h2>④ 일정 카드 만들기</h2>
     <div class="cards" id="cardList"></div>
     <div class="addcard">
       <b style="color:#B5457A; font-size:13px">새 카드 추가</b>
@@ -287,16 +293,23 @@
   </section>
 
   <section class="panel no-print">
-    <h2 style="cursor:pointer; user-select:none" onclick="toggleCalEdit()">④ 월별 일정 달력
-      <span class="cal-toggle" id="calEditArrow">▼ 눌러서 열기</span></h2>
-    <div id="calEditBox" style="display:none; margin-top:10px"></div>
-    <p class="hint">날짜 칸을 누르면 그 날 일정을 바로 넣을 수 있어요. 반복 일정은 이모지로만 살짝 보여요.</p>
-  </section>
-
-  <section class="panel no-print">
     <h2>⑤ 주간 일정 (매주 반복되는 것)</h2>
     <div class="week-grid" id="weekGrid"></div>
     <p class="hint">요일 아래 <b>+ 추가</b>를 누르고 카드를 고르면 돼요. 시간은 30분 단위로 고를 수 있어요.</p>
+  </section>
+
+  <section id="previewWrap">
+    <h2 class="no-print">⑥ 미리보기 👀 <span style="font-size:12px; color:#999; font-weight:normal">— 인쇄하면 A4 가로 용지에 이대로 나와요</span></h2>
+    <div id="calArea"></div>
+    <div class="pager no-print">
+      <button class="btn-ghost" id="pgPrev">◀ 이전</button>
+      <span class="lbl" id="pgLabel"></span>
+      <button class="btn-ghost" id="pgNext">다음 ▶</button>
+      <label class="fld" style="flex-direction:row; align-items:center; gap:6px">날짜로 가기
+        <input type="date" id="pgDate"></label>
+      <span class="hint">페이지 위 ✕를 누르면 그 날만 그 일정을 뺄 수 있어요 (인쇄에는 ✕ 안 나와요)</span>
+    </div>
+    <div id="printArea"></div>
   </section>
 </main>
 
@@ -656,6 +669,54 @@ function renderPreview(){
       if(dows.includes(dowIdx(d))) area.appendChild(dayPage(d));
     }
   }
+  applyPager();
+  fitPreviewZoom();
+}
+
+// 미리보기 페이지 폭을 다른 입력 박스들과 같은 가로 길이로 자동 확대
+function fitPreviewZoom(){
+  const ref = document.querySelector("main .panel") || document.querySelector("main");
+  if(!ref) return;
+  const targetW = ref.getBoundingClientRect().width;
+  if(!targetW) return;
+  const pageNativeWidthPx = 297 * 96 / 25.4; // mm -> px (297mm 페이지 원본 폭)
+  const z = Math.max(0.3, Math.min(1, targetW / pageNativeWidthPx));
+  document.querySelectorAll(".page").forEach(p=>{ p.style.zoom = z; });
+}
+window.addEventListener("resize", fitPreviewZoom);
+
+// ---------- 미리보기 한 장씩 넘기기 ----------
+let curKey=null;
+function pagerPages(){ return [...printArea.querySelectorAll(".page")]; }
+function applyPager(){
+  const pages=pagerPages();
+  if(!pages.length){ pgLabel.textContent="페이지 없음"; return; }
+  let idx=pages.findIndex(p=>p.dataset.date===curKey);
+  if(idx<0) idx=0;
+  showPage(idx);
+}
+function showPage(idx){
+  const pages=pagerPages();
+  idx=Math.max(0, Math.min(idx, pages.length-1));
+  pages.forEach((p,j)=>p.classList.toggle("hide-screen", j!==idx));
+  const p=pages[idx];
+  curKey=p.dataset.date;
+  const title=p.dataset.date==="calendar" ? "📅 월별 달력"
+    : p.querySelector(".p-title")?.textContent.replace(/🌈/g,"").trim();
+  pgLabel.textContent=title;
+  if(p.dataset.date && p.dataset.date!=="calendar") pgDate.value=p.dataset.date;
+}
+function bindPager(){
+  pgPrev.onclick=()=>{ const pages=pagerPages();
+    const i=pages.findIndex(p=>p.dataset.date===curKey); showPage(i-1); };
+  pgNext.onclick=()=>{ const pages=pagerPages();
+    const i=pages.findIndex(p=>p.dataset.date===curKey); showPage(i+1); };
+  pgDate.onchange=()=>{
+    const pages=pagerPages();
+    const i=pages.findIndex(p=>p.dataset.date===pgDate.value);
+    if(i>=0) showPage(i);
+    else alert("그 날짜의 페이지가 없어요! (기간 밖이거나 뺀 요일이에요)");
+  };
 }
 
 function monthPage(start,end){
@@ -839,6 +900,7 @@ loadTheme();
 buildTimeOptions(pickTime);
 renderPalette();
 bindBasics();
+bindPager();
 renderAll();
 </script>
 </body>
