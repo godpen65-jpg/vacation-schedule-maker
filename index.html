@@ -40,8 +40,8 @@
   .btn-ghost:hover{background:var(--soft);}
 
   main{max-width:1050px; margin:0 auto; padding:18px 16px 60px;}
-  section.panel{background:#fff; border:2px solid var(--line); border-radius:16px; padding:18px 20px; margin-top:18px;}
-  section.panel h2{font-size:16px; color:var(--pink); margin-bottom:12px;}
+  .panel{background:#fff; border:2px solid var(--line); border-radius:16px; padding:18px 20px; margin-top:18px;}
+  .panel h2{font-size:16px; color:var(--pink); margin-bottom:12px;}
   .hint{font-size:12px; color:#999; margin-top:6px;}
 
   .row{display:flex; flex-wrap:wrap; gap:14px; align-items:center;}
@@ -265,8 +265,12 @@
   </section>
 
   <section id="monthlyPreviewWrap" class="preview-block">
-    <h2 class="no-print">📅 월별 달력 <span style="font-size:12px; color:#999; font-weight:normal">— 날짜 칸을 누르면 바로 일정을 넣을 수 있어요. 인쇄하면 예쁜 달력으로 나와요!</span></h2>
-    <div id="calEditBox" class="panel no-print"></div>
+    <div class="panel no-print">
+      <h2 style="cursor:pointer; user-select:none; margin-bottom:0" onclick="toggleCalEdit()">📅 월별 달력
+        <span style="font-size:12px; color:#999; font-weight:normal">— 날짜 칸을 누르면 바로 일정을 넣을 수 있어요</span>
+        <span class="cal-toggle" id="calEditArrow">▲ 접기</span></h2>
+      <div id="calEditBox" style="margin-top:12px"></div>
+    </div>
     <div id="calArea"></div>
   </section>
 
@@ -595,6 +599,12 @@ function renderDates(){
 }
 
 // ---------- 수정용 월별 달력 ----------
+let calEditOpen=true;
+function toggleCalEdit(){
+  calEditOpen=!calEditOpen;
+  calEditBox.style.display=calEditOpen?"":"none";
+  calEditArrow.textContent=calEditOpen?"▲ 접기":"▼ 펴기";
+}
 function renderCalEdit(){
   calEditBox.innerHTML="";
   if(!state.start||!state.end) return;
