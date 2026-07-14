@@ -174,6 +174,7 @@
   table.cal td.out{background:#F5F5F5;}
   table.cal td.we{background:var(--we);}
   table.cal td div.it{margin-top:.5mm; word-break:keep-all; line-height:1.25;}
+  table.cal td div.it.day-emoji{font-size:15px;}
   table.cal td .re-bottom{position:absolute; left:2mm; right:2mm; bottom:1.2mm; opacity:.75; font-size:13px;}
 
   .cal-legend{margin-top:2.5mm; font-size:12px; color:#666; background:var(--cell);
@@ -193,9 +194,10 @@
   #calEditBox td .d-row .d{font-size:12px; font-weight:bold; color:#333;}
   #calEditBox td .d-row .re-top{font-size:12px;}
   #calEditBox td .re-bottom{position:absolute; left:6px; right:6px; bottom:4px; opacity:.7; font-size:12px;}
-  #calEditBox td .ci{display:flex; align-items:center; gap:3px; margin-top:2px;
-    background:#fff; border:1px solid var(--line4); border-radius:6px; padding:1px 4px;}
-  #calEditBox td .ci .x{margin-left:auto; color:#D99; font-weight:bold; padding:0 2px;}
+  #calEditBox td .ci-wrap{display:flex; flex-wrap:wrap; gap:3px; margin-top:3px;}
+  #calEditBox td .ci{display:inline-flex; align-items:center; gap:2px;
+    background:#fff; border:1px solid var(--line4); border-radius:6px; padding:1px 4px; font-size:14px;}
+  #calEditBox td .ci .x{color:#D99; font-weight:bold; padding:0 2px; font-size:10px;}
   #calEditBox td .ci .x:hover{color:#C0392B;}
   .cal-toggle{float:right; font-size:13px; color:var(--txt); font-weight:normal;}
 
@@ -645,16 +647,19 @@ function renderCalEdit(){
           let html=`<div class="d-row"><span class="d">${fmt(d)}</span><span class="re-top banner">${rec?.banner?esc(rec.banner):""}</span></div>`;
           if(remojis) html+=`<div class="re-bottom">${remojis}</div>`;
           td.innerHTML=html;
-          (rec?.items||[]).forEach((it,idx)=>{
-            const c=cardById(it.cardId); if(!c) return;
-            const ci=document.createElement("div"); ci.className="ci";
-            ci.innerHTML=`<span>${c.emoji}</span><span>${esc(c.name)}</span>`+
-              (it.time?`<span style="color:var(--txt);font-weight:bold">${it.time}</span>`:"")+
-              `<span class="x">✕</span>`;
-            ci.querySelector(".x").onclick=(ev)=>{ ev.stopPropagation();
-              rec.items.splice(idx,1); save(); renderAll(); };
-            td.appendChild(ci);
-          });
+          if(rec?.items?.length){
+            const wrap=document.createElement("div"); wrap.className="ci-wrap";
+            rec.items.forEach((it,idx)=>{
+              const c=cardById(it.cardId); if(!c) return;
+              const ci=document.createElement("span"); ci.className="ci";
+              ci.title=c.name+(it.time?` (${it.time})`:"");
+              ci.innerHTML=`<span>${c.emoji}</span><span class="x">✕</span>`;
+              ci.querySelector(".x").onclick=(ev)=>{ ev.stopPropagation();
+                rec.items.splice(idx,1); save(); renderAll(); };
+              wrap.appendChild(ci);
+            });
+            td.appendChild(wrap);
+          }
           td.onclick=()=>{
             inDayDate.value=dk;
             inDayBanner.value=state.days[dk]?.banner||"";
@@ -772,12 +777,10 @@ function monthPage(start,end){
           const hid=rec?.hiddenRoutine||[];
           const remojis=state.routine[i].filter(it=>!hid.includes(it.cardId))
             .map(it=>cardById(it.cardId)?.emoji).filter(Boolean).join(" ");
-          // 오른쪽 위는 '한 마디' 전용 (없으면 빈칸), 반복 이모지는 칸 아래쪽
+          // 오른쪽 위는 '한 마디' 전용 (없으면 빈칸), 날짜별 일정은 이모지만, 반복 이모지는 칸 아래쪽
           cell=`<div class="d-row"><span class="d">${fmt(cur)}</span><span class="re-top banner">${rec?.banner?esc(rec.banner):""}</span></div>`;
-          const its=(rec?.items||[]);
-          its.slice(0,3).forEach(it=>{ const c=cardById(it.cardId);
-            if(c) cell+=`<div class="it">${c.emoji} ${esc(c.name)}</div>`; });
-          if(its.length>3) cell+=`<div class="it">…외 ${its.length-3}개</div>`;
+          const dayEmojis=(rec?.items||[]).map(it=>cardById(it.cardId)?.emoji).filter(Boolean).join(" ");
+          if(dayEmojis) cell+=`<div class="it day-emoji">${dayEmojis}</div>`;
           if(remojis) cell+=`<div class="re-bottom">${remojis}</div>`;
         }
         html+=`<td class="${cls}">${cell}</td>`;
@@ -792,9 +795,10 @@ function monthPage(start,end){
   note.textContent="📌 날짜별 일정만 글씨로 표시돼요. 매주 하는 일정은 이모지로만 살짝 보여요 (뜻은 아래 참고!)";
   pg.appendChild(note);
 
-  // 달력 칸에 이모지만 나온 반복 일정이 무슨 뜻인지 설명하는 범례
+  // 달력 칸에 이모지만 나온 일정이 무슨 뜻인지 설명하는 범례 (반복 + 날짜별 모두)
   const usedIds=new Set();
   dows.forEach(i=>{ state.routine[i].forEach(it=>usedIds.add(it.cardId)); });
+  Object.values(state.days).forEach(rec=>(rec.items||[]).forEach(it=>usedIds.add(it.cardId)));
   const pairs=[...usedIds].map(id=>cardById(id)).filter(Boolean)
     .map(c=>`<span class="pair">${c.emoji} : ${esc(c.name)}</span>`).join(" ");
   if(pairs){
