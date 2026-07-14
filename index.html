@@ -247,6 +247,11 @@
       <b style="font-size:13px; color:var(--txt)">🎨 배경 색깔</b>
       <div class="theme-btns" id="themeBtns"></div>
     </div>
+    <div class="row" style="margin-top:12px">
+      <label class="fld">⏰ 시간 일정 없는 날 문구
+        <input type="text" id="inEmptyMsg" style="width:340px" placeholder="오늘의 일정을 잘 지켜보자!">
+      </label>
+    </div>
     <p class="hint">체크한 것만 아래 미리보기와 인쇄에 나와요. 색깔을 고르면 화면과 인쇄물 모두 바뀌어요!</p>
   </section>
 
@@ -410,6 +415,7 @@ function defaultState(){
     start:"2026-07-16", end:"2026-08-15",
     makeMonthly:false, makeWeekly:true, makeDaily:true,
     showSat:true, showSun:true,
+    emptyTimeMsg:"오늘의 일정을 잘 지켜보자!",
     nextId:100, cards,
     routine:{0:[{cardId:6,time:"17:00"},{cardId:7,time:""}],
              1:[{cardId:1,time:""}],
@@ -430,6 +436,7 @@ function load(){
   if(state.showSat===undefined) state.showSat=true;
   if(state.showSun===undefined) state.showSun=true;
   if(!state.theme) state.theme="pink";
+  if(!state.emptyTimeMsg) state.emptyTimeMsg="오늘의 일정을 잘 지켜보자!";
 }
 function visibleDows(){
   const v=[0,1,2,3,4];
@@ -452,6 +459,11 @@ function bindBasics(){
   inTitle.value = state.title; inStart.value = state.start; inEnd.value = state.end;
   ckMonthly.checked = state.makeMonthly; ckWeekly.checked = state.makeWeekly; ckDaily.checked = state.makeDaily;
   ckSat.checked = state.showSat; ckSun.checked = state.showSun;
+  inEmptyMsg.value = state.emptyTimeMsg;
+  inEmptyMsg.addEventListener("change",()=>{
+    state.emptyTimeMsg=inEmptyMsg.value.trim()||"오늘의 일정을 잘 지켜보자!";
+    inEmptyMsg.value=state.emptyTimeMsg; save(); renderPreview();
+  });
   [inTitle,inStart,inEnd].forEach(el=>el.addEventListener("change",()=>{
     state.title=inTitle.value; state.start=inStart.value; state.end=inEnd.value; save(); renderPreview();
   }));
@@ -852,7 +864,7 @@ function dayPage(d){
       r.innerHTML=`<span class="tm">${it.time}</span><span>${c.emoji}</span><span>${esc(c.name)}</span>`;
       tl.appendChild(r); });
   } else {
-    tl.innerHTML=`<div class="empty-note">오늘은 정해진 시간이 없어요! 하고 싶은 것부터 해요 🌈</div>`;
+    tl.innerHTML=`<div class="empty-note">${esc(state.emptyTimeMsg||"오늘의 일정을 잘 지켜보자!")}</div>`;
   }
   left.appendChild(tl);
 
@@ -914,6 +926,7 @@ function bindOnce(){
   inTitle.value=state.title; inStart.value=state.start; inEnd.value=state.end;
   ckMonthly.checked=state.makeMonthly; ckWeekly.checked=state.makeWeekly; ckDaily.checked=state.makeDaily;
   ckSat.checked=state.showSat; ckSun.checked=state.showSun;
+  inEmptyMsg.value=state.emptyTimeMsg;
 }
 function renderAll(){ renderCards(); renderWeek(); renderDates(); renderPreview(); renderCalEdit(); }
 
