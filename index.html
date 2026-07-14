@@ -9,71 +9,82 @@
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
 <style>
   :root{
+    /* 테마 색 (기본: 핑크) — JS의 THEMES에서 통째로 바뀜 */
     --pink:#E91E7C; --pink-dark:#C2185B; --hot:#FF4D9D;
+    --txt:#B5457A; --txt-dark:#7A1E4A;
+    --bg:#FFF5FA; --soft:#FFF0F7; --sel:#FFE9F4;
+    --cell:#FFF7FB; --cell2:#FFFAFC; --cell3:#FFF9F5; --card:#FFFDFE;
+    --line:#F8C8DD; --line2:#F3D3E2; --line3:#F3C8DC; --line4:#F0D0E0; --line5:#F5D7E6;
+    --we:#FFEAF4; --head:#FFD1E6;
+    /* 무지개 색 (테마와 무관하게 유지) */
     --r0:#FFB3BA; --r1:#FFDFBA; --r2:#FFFFBA; --r3:#BAFFC9; --r4:#BAE1FF; --r5:#C9BAFF; --r6:#F1BAFF;
     --d0:#FF6B7A; --d1:#FFA94D; --d2:#FFD43B; --d3:#51CF66; --d4:#339AF0; --d5:#845EF7; --d6:#F06595;
   }
+  .theme-btns{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .theme-btns .tb{width:30px; height:30px; border-radius:50%; cursor:pointer;
+    border:3px solid rgba(0,0,0,.12);}
+  .theme-btns .tb.sel{border-color:#555; box-shadow:0 0 0 2px #fff inset;}
   *{box-sizing:border-box; margin:0; padding:0;
     -webkit-print-color-adjust:exact; print-color-adjust:exact; color-adjust:exact;}
-  body{font-family:"Jua","Malgun Gothic","맑은 고딕",sans-serif; background:#FFF5FA; color:#444;}
+  body{font-family:"Jua","Malgun Gothic","맑은 고딕",sans-serif; background:var(--bg); color:#444;}
 
   /* ---------- 편집 화면 ---------- */
-  .app-header{position:sticky; top:0; z-index:50; background:linear-gradient(90deg,#FFD1E6,#FFE9F4);
+  .app-header{position:sticky; top:0; z-index:50; background:linear-gradient(90deg,var(--head),var(--sel));
     padding:14px 20px; display:flex; align-items:center; gap:12px; box-shadow:0 2px 8px rgba(233,30,124,.15);}
   .app-header h1{font-size:20px; color:var(--pink);}
   .app-header .spacer{flex:1;}
   button{font-family:inherit; cursor:pointer; border:none; border-radius:10px; font-weight:bold;}
   .btn-main{background:var(--pink); color:#fff; padding:10px 22px; font-size:15px;}
   .btn-main:hover{background:var(--pink-dark);}
-  .btn-ghost{background:#fff; color:var(--pink); padding:10px 16px; font-size:13px; border:2px solid #F8C8DD;}
-  .btn-ghost:hover{background:#FFF0F7;}
+  .btn-ghost{background:#fff; color:var(--pink); padding:10px 16px; font-size:13px; border:2px solid var(--line);}
+  .btn-ghost:hover{background:var(--soft);}
 
   main{max-width:1050px; margin:0 auto; padding:18px 16px 60px;}
-  section.panel{background:#fff; border:2px solid #F8C8DD; border-radius:16px; padding:18px 20px; margin-top:18px;}
+  section.panel{background:#fff; border:2px solid var(--line); border-radius:16px; padding:18px 20px; margin-top:18px;}
   section.panel h2{font-size:16px; color:var(--pink); margin-bottom:12px;}
   .hint{font-size:12px; color:#999; margin-top:6px;}
 
   .row{display:flex; flex-wrap:wrap; gap:14px; align-items:center;}
-  label.fld{display:flex; flex-direction:column; gap:4px; font-size:12px; color:#B5457A; font-weight:bold;}
+  label.fld{display:flex; flex-direction:column; gap:4px; font-size:12px; color:var(--txt); font-weight:bold;}
   input[type=text],input[type=date],select{font-family:inherit; font-size:14px; padding:8px 10px;
-    border:2px solid #F3D3E2; border-radius:8px; background:#FFFDFE;}
+    border:2px solid var(--line2); border-radius:8px; background:var(--card);}
   input[type=text]:focus,input[type=date]:focus,select:focus{outline:none; border-color:var(--hot);}
-  .chk{display:flex; align-items:center; gap:6px; font-size:14px; font-weight:bold; color:#7A1E4A;
-    background:#FFF0F7; padding:8px 14px; border-radius:10px; cursor:pointer; user-select:none;}
+  .chk{display:flex; align-items:center; gap:6px; font-size:14px; font-weight:bold; color:var(--txt-dark);
+    background:var(--soft); padding:8px 14px; border-radius:10px; cursor:pointer; user-select:none;}
   .chk input{width:18px; height:18px; accent-color:var(--pink);}
 
   /* 일정 카드 */
   .cards{display:flex; flex-wrap:wrap; gap:8px;}
-  .card{display:flex; align-items:center; gap:6px; background:#FFF7FB; border:2px solid #F3C8DC;
+  .card{display:flex; align-items:center; gap:6px; background:var(--cell); border:2px solid var(--line3);
     padding:7px 12px; border-radius:20px; font-size:14px; font-weight:bold; color:#555;}
   .card .del{color:#D88; font-weight:bold; cursor:pointer; margin-left:2px; font-size:12px;}
   .card .del:hover{color:#C0392B;}
-  .addcard{margin-top:14px; padding-top:14px; border-top:2px dashed #F3D3E2;}
+  .addcard{margin-top:14px; padding-top:14px; border-top:2px dashed var(--line2);}
   .emoji-palette{display:flex; flex-wrap:wrap; gap:4px; margin:8px 0;}
   .emoji-palette span{font-size:20px; padding:5px 7px; border-radius:8px; cursor:pointer; border:2px solid transparent;}
-  .emoji-palette span:hover{background:#FFF0F7;}
-  .emoji-palette span.sel{border-color:var(--hot); background:#FFE9F4;}
+  .emoji-palette span:hover{background:var(--soft);}
+  .emoji-palette span.sel{border-color:var(--hot); background:var(--sel);}
 
   /* 주간 루틴 */
   .week-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:8px;}
-  .day-col{border:2px solid #F3D3E2; border-radius:12px; overflow:hidden; background:#fff; min-height:120px;
+  .day-col{border:2px solid var(--line2); border-radius:12px; overflow:hidden; background:#fff; min-height:120px;
     display:flex; flex-direction:column;}
   .day-col .day-head{padding:7px 4px; text-align:center; font-weight:bold; font-size:14px; color:#555;}
   .day-col .items{flex:1; padding:6px; display:flex; flex-direction:column; gap:4px;}
-  .item-chip{display:flex; align-items:center; gap:4px; background:#FFFAFC; border:1.5px solid #F0D0E0;
+  .item-chip{display:flex; align-items:center; gap:4px; background:var(--cell2); border:1.5px solid var(--line4);
     border-radius:8px; padding:4px 6px; font-size:12px;}
-  .item-chip .t{color:#B5457A; font-weight:bold; font-size:11px;}
+  .item-chip .t{color:var(--txt); font-weight:bold; font-size:11px;}
   .item-chip .x{margin-left:auto; cursor:pointer; color:#D99; font-weight:bold; padding:0 3px;}
   .item-chip .x:hover{color:#C0392B;}
-  .add-slot{margin:6px; padding:6px; border:2px dashed #F3C8DC; background:none; border-radius:8px;
+  .add-slot{margin:6px; padding:6px; border:2px dashed var(--line3); background:none; border-radius:8px;
     color:var(--pink); font-size:13px;}
-  .add-slot:hover{background:#FFF0F7;}
+  .add-slot:hover{background:var(--soft);}
 
   /* 날짜별 일정 */
   .day-editor{display:flex; flex-wrap:wrap; gap:14px; align-items:flex-end; margin-bottom:12px;}
   .datelist{display:flex; flex-direction:column; gap:8px;}
-  .date-block{border:2px solid #F3D3E2; border-radius:12px; padding:10px 14px; background:#FFFDFE;}
-  .date-block .db-head{display:flex; align-items:center; gap:10px; font-weight:bold; color:#7A1E4A; font-size:14px;}
+  .date-block{border:2px solid var(--line2); border-radius:12px; padding:10px 14px; background:var(--card);}
+  .date-block .db-head{display:flex; align-items:center; gap:10px; font-weight:bold; color:var(--txt-dark); font-size:14px;}
   .date-block .db-banner{font-size:12px; color:var(--pink);}
   .date-block .items{display:flex; flex-wrap:wrap; gap:5px; margin-top:7px;}
 
@@ -85,39 +96,40 @@
   .modal h3{color:var(--pink); font-size:16px; margin-bottom:12px;}
   .pick-cards{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:14px;}
   .pick-cards .card{cursor:pointer;}
-  .pick-cards .card.sel{border-color:var(--hot); background:#FFE9F4; color:#7A1E4A;}
+  .pick-cards .card.sel{border-color:var(--hot); background:var(--sel); color:var(--txt-dark);}
   .modal .row2{display:flex; gap:10px; align-items:center; margin-bottom:16px;}
   .modal-btns{display:flex; gap:10px; justify-content:flex-end;}
 
   /* ---------- 출력(미리보기+인쇄) ---------- */
-  #previewWrap{margin-top:18px; margin-bottom:18px;}
-  #previewWrap h2{color:var(--pink); font-size:17px; margin-bottom:10px;}
+  .preview-block{margin-top:18px; margin-bottom:18px;}
+  .preview-block h2{color:var(--pink); font-size:17px; margin-bottom:10px;}
   .page{width:297mm; min-height:210mm; background:#fff; margin:0 auto 14px; padding:8mm 10mm;
     box-shadow:0 3px 14px rgba(0,0,0,.12); position:relative; overflow:hidden;}
   @media screen{
     .page.hide-screen{display:none;}
+    #calArea{display:none;}  /* 화면에서는 수정용 달력을 보여주고, 인쇄용 달력은 인쇄할 때만 */
   }
   @media print{
     .page{zoom:1 !important;}
   }
   .pager{display:flex; align-items:center; gap:10px; flex-wrap:wrap; background:#fff;
-    border:2px solid #F8C8DD; border-radius:14px; padding:10px 14px; margin-bottom:12px;}
-  .pager .lbl{font-weight:bold; color:#7A1E4A; font-size:14px; min-width:170px; text-align:center;}
+    border:2px solid var(--line); border-radius:14px; padding:10px 14px; margin-bottom:12px;}
+  .pager .lbl{font-weight:bold; color:var(--txt-dark); font-size:14px; min-width:170px; text-align:center;}
   .rm{margin-left:2mm; color:#E58; font-weight:bold; cursor:pointer; font-size:12px;
-    border:1.5px solid #F5C0D2; border-radius:50%; width:6mm; height:6mm; flex:none;
+    border:1.5px solid var(--line3); border-radius:50%; width:6mm; height:6mm; flex:none;
     display:flex; align-items:center; justify-content:center; background:#fff;}
-  .rm:hover{background:#FFE9F4; color:#C0392B;}
-  .hidden-bar{margin-top:3mm; font-size:11px; color:#B5457A; background:#FFF0F7;
-    border:1.5px dashed #F3C8DC; border-radius:2.5mm; padding:2.5mm 3mm;}
-  .hidden-bar button{background:#fff; border:1.5px solid #F3C8DC; border-radius:10px;
-    padding:2px 8px; font-size:11px; color:#7A1E4A; margin:1px 2px;}
-  .hidden-bar button:hover{background:#FFE9F4;}
+  .rm:hover{background:var(--sel); color:#C0392B;}
+  .hidden-bar{margin-top:3mm; font-size:11px; color:var(--txt); background:var(--soft);
+    border:1.5px dashed var(--line3); border-radius:2.5mm; padding:2.5mm 3mm;}
+  .hidden-bar button{background:#fff; border:1.5px solid var(--line3); border-radius:10px;
+    padding:2px 8px; font-size:11px; color:var(--txt-dark); margin:1px 2px;}
+  .hidden-bar button:hover{background:var(--sel);}
 
   .phead{display:flex; align-items:flex-start; gap:2mm;}
   .phead .side{width:42mm; flex:none;}
   .phead .mid{flex:1;}
   .p-title{text-align:center; font-size:24px; font-weight:bold; color:var(--pink); padding-top:2mm;}
-  .p-banner{text-align:center; font-size:13px; font-weight:bold; color:#B5457A; margin-top:2mm;}
+  .p-banner{text-align:center; font-size:13px; font-weight:bold; color:var(--txt); margin-top:2mm;}
   .stamp{text-align:center;}
   .stamp .lbl{font-size:10px; font-weight:bold; color:var(--pink); margin-bottom:1.5mm;}
   .stamp .box{width:38mm; height:20mm; border:2.5px dashed var(--hot); border-radius:4mm; background:#fff; margin-left:auto;}
@@ -126,73 +138,80 @@
   table.wk th{padding:3mm 1mm; font-size:17px; color:#555; border:1.5px solid #fff;}
   table.wk th .tag{display:block; font-size:12px; font-weight:normal; color:#777; margin-top:1mm;}
   table.wk th.today{color:#fff; outline:3px solid var(--pink-dark); outline-offset:-3px;}
-  table.wk th.today .tag{color:#FFE9F4;}
-  table.wk td{border:1.5px solid #F0D0E0; background:#fff; vertical-align:middle; text-align:center;
+  table.wk th.today .tag{color:var(--sel);}
+  table.wk td{border:1.5px solid var(--line4); background:#fff; vertical-align:middle; text-align:center;
     padding:2mm 1mm; font-size:14px; color:#666; height:20mm; word-break:keep-all;}
-  table.wk td.today{background:#FFE9F4; outline:3px solid var(--pink-dark); outline-offset:-3px;
-    color:#7A1E4A; font-weight:bold;}
+  table.wk td.today{background:var(--sel); outline:3px solid var(--pink-dark); outline-offset:-3px;
+    color:var(--txt-dark); font-weight:bold;}
   table.wk td div{margin:.6mm 0;}
 
-  .bottom{display:flex; gap:5mm; margin-top:5mm;}
-  .bcol{flex:1; border:2px solid #F8C8DD; border-radius:5mm; padding:5mm 6mm; min-height:105mm;}
-  .bcol.left{background:#FFF7FB;}
-  .bcol.right{background:#FFF9F5;}
+  .bottom{display:flex; gap:5mm; margin-top:4mm;}
+  .bcol{flex:1; border:2px solid var(--line); border-radius:5mm; padding:4mm 6mm; min-height:93mm;}
+  .bcol.left{background:var(--cell);}
+  .bcol.right{background:var(--cell3);}
   .bcol h4{color:var(--pink); font-size:17px; margin-bottom:4mm;}
   .timeline{display:flex; flex-direction:column; gap:2.5mm;}
   .timeline .tl{display:flex; align-items:center; gap:3mm; background:#fff; border:2px solid var(--r0);
     border-radius:2.5mm; padding:2.5mm 3.5mm; font-size:16px;}
-  .timeline .tl .tm{font-weight:bold; color:#B5457A; min-width:16mm; font-size:15px;}
+  .timeline .tl .tm{font-weight:bold; color:var(--txt); min-width:16mm; font-size:15px;}
   .cl{display:flex; flex-direction:column; gap:2.5mm;}
   .cl .cli{display:flex; align-items:center; gap:3mm;}
   .cl .box{width:8mm; height:8mm; border:2.5px solid var(--d0); border-radius:2mm; background:#fff; flex:none;}
-  .cl .txt{flex:1; background:#FFFAFC; border:1.5px solid #F5D7E6; border-radius:2.5mm;
+  .cl .txt{flex:1; background:var(--cell2); border:1.5px solid var(--line5); border-radius:2.5mm;
     padding:2.5mm 3.5mm; font-size:16px;}
-  .empty-note{color:#B99; font-size:12px; background:#fff; border:2px dashed #F3D3E2;
+  .empty-note{color:#B99; font-size:12px; background:#fff; border:2px dashed var(--line2);
     border-radius:2.5mm; padding:4mm; text-align:center;}
 
   /* 월별 달력 */
   table.cal{width:100%; border-collapse:collapse; margin-top:3mm; table-layout:fixed;}
   table.cal th{padding:2mm; color:#fff; font-size:16px; border:1.5px solid #fff;}
-  table.cal td{border:1.5px solid #fff; background:#FFF7FB; height:21mm; vertical-align:top;
-    padding:1.2mm 2mm; font-size:13px; color:#555;}
+  table.cal td{border:1.5px solid #fff; background:var(--cell); height:19mm; vertical-align:top;
+    padding:1.2mm 2mm 6mm; font-size:13px; color:#555; position:relative; overflow:hidden;}
   .d-row{display:flex; align-items:flex-start; justify-content:space-between; gap:2mm;}
   .d-row .d{font-size:15px; font-weight:bold; color:#333;}
-  .d-row .re-top{font-size:13px; opacity:.8; text-align:right; white-space:nowrap;}
+  .d-row .re-top{font-size:13px; text-align:right; min-height:5mm;}
+  .d-row .re-top.banner{color:var(--pink); font-weight:bold; word-break:keep-all;}
   table.cal td.out{background:#F5F5F5;}
-  table.cal td.we{background:#FFEAF4;}
+  table.cal td.we{background:var(--we);}
   table.cal td div.it{margin-top:.5mm; word-break:keep-all; line-height:1.25;}
+  table.cal td .re-bottom{position:absolute; left:2mm; right:2mm; bottom:1.2mm; opacity:.75; font-size:13px;}
 
-  .cal-legend{margin-top:2.5mm; font-size:12px; color:#666; background:#FFF7FB;
-    border:1.5px dashed #F3C8DC; border-radius:2.5mm; padding:2mm 4mm; line-height:1.6;}
+  .cal-legend{margin-top:2.5mm; font-size:12px; color:#666; background:var(--cell);
+    border:1.5px dashed var(--line3); border-radius:2.5mm; padding:2mm 4mm; line-height:1.6;}
   .cal-legend b{color:var(--pink); font-size:12px;}
   .cal-legend span.pair{display:inline-block; margin-right:4mm; white-space:nowrap;}
 
   /* 수정용 월별 달력 */
   #calEditBox table{width:100%; border-collapse:collapse; table-layout:fixed;}
   #calEditBox th{padding:7px; color:#fff; font-size:13px; border:1.5px solid #fff;}
-  #calEditBox td{border:1.5px solid #fff; background:#FFF7FB; height:86px; vertical-align:top;
-    padding:5px 6px; font-size:11px; color:#555; cursor:pointer;}
+  #calEditBox td{border:1.5px solid #fff; background:var(--cell); height:86px; vertical-align:top;
+    padding:5px 6px 22px; font-size:11px; color:#555; cursor:pointer; position:relative; overflow:hidden;}
   #calEditBox td:hover{outline:2.5px solid var(--hot); outline-offset:-2.5px;}
   #calEditBox td.out{background:#F5F5F5; cursor:default;}
   #calEditBox td.out:hover{outline:none;}
-  #calEditBox td.we{background:#FFEAF4;}
+  #calEditBox td.we{background:var(--we);}
   #calEditBox td .d-row .d{font-size:12px; font-weight:bold; color:#333;}
-  #calEditBox td .d-row .re-top{font-size:12px; opacity:.75; white-space:nowrap;}
-  #calEditBox td .bn{color:var(--pink); font-weight:bold; margin-top:2px; word-break:keep-all;}
+  #calEditBox td .d-row .re-top{font-size:12px;}
+  #calEditBox td .re-bottom{position:absolute; left:6px; right:6px; bottom:4px; opacity:.7; font-size:12px;}
   #calEditBox td .ci{display:flex; align-items:center; gap:3px; margin-top:2px;
-    background:#fff; border:1px solid #F0D0E0; border-radius:6px; padding:1px 4px;}
+    background:#fff; border:1px solid var(--line4); border-radius:6px; padding:1px 4px;}
   #calEditBox td .ci .x{margin-left:auto; color:#D99; font-weight:bold; padding:0 2px;}
   #calEditBox td .ci .x:hover{color:#C0392B;}
-  .cal-toggle{float:right; font-size:13px; color:#B5457A; font-weight:normal;}
+  .cal-toggle{float:right; font-size:13px; color:var(--txt); font-weight:normal;}
 
   @media print{
     body{background:#fff;}
     .no-print{display:none !important;}
-    #previewWrap h2{display:none;}
+    .preview-block h2{display:none;}
     main{max-width:none; padding:0; margin:0;}
-    #previewWrap{margin:0;}
-    .page{box-shadow:none; margin:0 auto; page-break-after:always;}
-    .page:last-child{page-break-after:auto;}
+    .preview-block{margin:0;}
+    .page{
+      box-shadow:none; margin:0 auto; padding:8mm 10mm;
+      width:297mm; height:210mm; min-height:0; max-height:210mm; overflow:hidden;
+      page-break-after:always; page-break-inside:avoid; break-after:page; break-inside:avoid;
+    }
+    .page:last-child{page-break-after:auto; break-after:auto;}
+    .bottom, .bcol, table.wk, table.cal{page-break-inside:avoid; break-inside:avoid;}
   }
   @page{size:A4 landscape; margin:0;}
 </style>
@@ -224,7 +243,11 @@
       <label class="chk"><input type="checkbox" id="ckSat" checked> 토요일 포함</label>
       <label class="chk"><input type="checkbox" id="ckSun" checked> 일요일 포함</label>
     </div>
-    <p class="hint">체크한 것만 아래 미리보기와 인쇄에 나와요.</p>
+    <div class="row" style="margin-top:12px">
+      <b style="font-size:13px; color:var(--txt)">🎨 배경 색깔</b>
+      <div class="theme-btns" id="themeBtns"></div>
+    </div>
+    <p class="hint">체크한 것만 아래 미리보기와 인쇄에 나와요. 색깔을 고르면 화면과 인쇄물 모두 바뀌어요!</p>
   </section>
 
   <section class="panel no-print">
@@ -241,25 +264,17 @@
     <p class="hint">여행, 학교 프로그램, 특강처럼 특정 날짜에만 있는 일정을 넣어요. 월별 달력에는 이 일정들이 표시돼요!</p>
   </section>
 
-  <section id="previewWrap">
-    <h2 class="no-print">👀 미리보기 <span style="font-size:12px; color:#999; font-weight:normal">— 인쇄하면 A4 가로 용지에 이대로 나와요</span></h2>
+  <section id="monthlyPreviewWrap" class="preview-block">
+    <h2 class="no-print">📅 월별 달력 <span style="font-size:12px; color:#999; font-weight:normal">— 날짜 칸을 누르면 바로 일정을 넣을 수 있어요. 인쇄하면 예쁜 달력으로 나와요!</span></h2>
+    <div id="calEditBox" class="panel no-print"></div>
     <div id="calArea"></div>
-    <div class="pager no-print">
-      <button class="btn-ghost" id="pgPrev">◀ 이전</button>
-      <span class="lbl" id="pgLabel"></span>
-      <button class="btn-ghost" id="pgNext">다음 ▶</button>
-      <label class="fld" style="flex-direction:row; align-items:center; gap:6px">날짜로 가기
-        <input type="date" id="pgDate"></label>
-      <span class="hint">페이지 위 ✕를 누르면 그 날만 그 일정을 뺄 수 있어요 (인쇄에는 ✕ 안 나와요)</span>
-    </div>
-    <div id="printArea"></div>
   </section>
 
   <section class="panel no-print">
     <h2>③ 일정 카드 만들기</h2>
     <div class="cards" id="cardList"></div>
     <div class="addcard">
-      <b style="color:#B5457A; font-size:13px">새 카드 추가</b>
+      <b style="color:var(--txt); font-size:13px">새 카드 추가</b>
       <div class="emoji-palette" id="emojiPalette"></div>
       <div class="row">
         <input type="text" id="inEmoji" style="width:70px; text-align:center; font-size:18px" placeholder="이모지">
@@ -271,16 +286,22 @@
   </section>
 
   <section class="panel no-print">
-    <h2 style="cursor:pointer; user-select:none" onclick="toggleCalEdit()">④ 월별 일정 달력
-      <span class="cal-toggle" id="calEditArrow">▼ 눌러서 열기</span></h2>
-    <div id="calEditBox" style="display:none; margin-top:10px"></div>
-    <p class="hint">날짜 칸을 누르면 그 날 일정을 바로 넣을 수 있어요. 반복 일정은 이모지로만 살짝 보여요.</p>
-  </section>
-
-  <section class="panel no-print">
-    <h2>⑤ 주간 일정 (매주 반복되는 것)</h2>
+    <h2>④ 주간 일정 (매주 반복되는 것)</h2>
     <div class="week-grid" id="weekGrid"></div>
     <p class="hint">요일 아래 <b>+ 추가</b>를 누르고 카드를 고르면 돼요. 시간은 30분 단위로 고를 수 있어요.</p>
+  </section>
+
+  <section id="dailyPreviewWrap" class="preview-block">
+    <h2 class="no-print">📄 하루 한 장 미리보기 <span style="font-size:12px; color:#999; font-weight:normal">— 인쇄하면 A4 가로 용지에 이대로 나와요</span></h2>
+    <div class="pager no-print">
+      <button class="btn-ghost" id="pgPrev">◀ 이전</button>
+      <span class="lbl" id="pgLabel"></span>
+      <button class="btn-ghost" id="pgNext">다음 ▶</button>
+      <label class="fld" style="flex-direction:row; align-items:center; gap:6px">날짜로 가기
+        <input type="date" id="pgDate"></label>
+      <span class="hint">페이지 위 ✕를 누르면 그 날만 그 일정을 뺄 수 있어요 (인쇄에는 ✕ 안 나와요)</span>
+    </div>
+    <div id="printArea"></div>
   </section>
 </main>
 
@@ -289,7 +310,7 @@
     <h3 id="modalTitle">일정 고르기</h3>
     <div class="pick-cards" id="pickCards"></div>
     <div class="row2">
-      <b style="font-size:13px; color:#B5457A">시간</b>
+      <b style="font-size:13px; color:var(--txt)">시간</b>
       <select id="pickTime"></select>
       <span class="hint">시간이 없으면 "시간 없음" 그대로 두세요.</span>
     </div>
@@ -304,9 +325,65 @@
 "use strict";
 const LS_KEY = "vacationScheduler.v1";
 const DOW = ["월","화","수","목","금","토","일"];
-const RB   = ["#FFB3BA","#FFDFBA","#FFFFBA","#BAFFC9","#BAE1FF","#C9BAFF","#F1BAFF"];
-const RBD  = ["#FF6B7A","#FFA94D","#FFD43B","#51CF66","#339AF0","#845EF7","#F06595"];
+const RB_COLOR  = ["#FFB3BA","#FFDFBA","#FFFFBA","#BAFFC9","#BAE1FF","#C9BAFF","#F1BAFF"];
+const RBD_COLOR = ["#FF6B7A","#FFA94D","#FFD43B","#51CF66","#339AF0","#845EF7","#F06595"];
+const RB_GRAY   = ["#EDEDED","#E5E5E5","#DDDDDD","#D5D5D5","#CDCDCD","#C5C5C5","#BDBDBD"];
+const RBD_GRAY  = ["#9A9A9A","#8D8D8D","#808080","#737373","#666666","#595959","#4D4D4D"];
+let RB  = RB_COLOR;
+let RBD = RBD_COLOR;
 const PALETTE = ["📱","💻","🧋","🧑‍🏫","🎨","⛳","🏫","✏️","📖","📚","🎹","🎻","🥁","🎤","🩰","🥋","⚽","🏀","⚾","🏊","🚴","🛼","🧩","♟️","🔬","🧪","➕","📐","🌈","🧳","🎬","🎮","🐶","🌸","⭐","🍀","🏛️","💪","🗣️","🇺🇸"];
+
+// ---------- 배경 테마 ----------
+const THEMES = {
+  pink:  {label:"핑크", swatch:"#FF8FC5",
+    "--pink":"#E91E7C","--pink-dark":"#C2185B","--hot":"#FF4D9D","--txt":"#B5457A","--txt-dark":"#7A1E4A",
+    "--bg":"#FFF5FA","--soft":"#FFF0F7","--sel":"#FFE9F4","--cell":"#FFF7FB","--cell2":"#FFFAFC","--cell3":"#FFF9F5",
+    "--card":"#FFFDFE","--line":"#F8C8DD","--line2":"#F3D3E2","--line3":"#F3C8DC","--line4":"#F0D0E0","--line5":"#F5D7E6",
+    "--we":"#FFEAF4","--head":"#FFD1E6"},
+  sky:   {label:"하늘", swatch:"#74C0FC",
+    "--pink":"#1C7ED6","--pink-dark":"#1864AB","--hot":"#339AF0","--txt":"#3B6EA5","--txt-dark":"#1E4976",
+    "--bg":"#F2F9FF","--soft":"#E7F3FF","--sel":"#DCEEFF","--cell":"#F2F9FF","--cell2":"#F7FBFF","--cell3":"#F4FAFF",
+    "--card":"#FBFDFF","--line":"#BBDEFB","--line2":"#CFE6F8","--line3":"#C5E1F7","--line4":"#D4E8F8","--line5":"#DCEDFA",
+    "--we":"#E3F2FD","--head":"#C9E4FC"},
+  yellow:{label:"노랑", swatch:"#FFD43B",
+    "--pink":"#E8930C","--pink-dark":"#D97706","--hot":"#FFA94D","--txt":"#A9750D","--txt-dark":"#7C5806",
+    "--bg":"#FFFBEB","--soft":"#FFF6D6","--sel":"#FFF1C2","--cell":"#FFFBEB","--cell2":"#FFFCF0","--cell3":"#FFFBF0",
+    "--card":"#FFFEF7","--line":"#FFE59A","--line2":"#FBEBB5","--line3":"#F8E6A8","--line4":"#F5E6B8","--line5":"#FAEFC4",
+    "--we":"#FFF3BF","--head":"#FFE9A8"},
+  green: {label:"연두", swatch:"#8CE99A",
+    "--pink":"#37A24A","--pink-dark":"#2B8A3E","--hot":"#51CF66","--txt":"#4C7F45","--txt-dark":"#2F5E2A",
+    "--bg":"#F3FBF0","--soft":"#E9F7E4","--sel":"#DDF3D6","--cell":"#F3FBF0","--cell2":"#F7FCF4","--cell3":"#F4FBF1",
+    "--card":"#FBFEF9","--line":"#C4E8B8","--line2":"#D3ECC9","--line3":"#CBE9BF","--line4":"#D8EECE","--line5":"#DFF1D7",
+    "--we":"#E4F7DC","--head":"#CFEDC3"},
+  purple:{label:"보라", swatch:"#B197FC",
+    "--pink":"#7C3AED","--pink-dark":"#6D28D9","--hot":"#9775FA","--txt":"#6D4FA8","--txt-dark":"#4A3178",
+    "--bg":"#F8F5FF","--soft":"#F1EBFF","--sel":"#E9DFFF","--cell":"#F8F5FF","--cell2":"#FAF8FF","--cell3":"#F8F6FF",
+    "--card":"#FCFBFF","--line":"#D6C5F5","--line2":"#E0D3F7","--line3":"#DACBF6","--line4":"#E3D8F8","--line5":"#E8DFF9",
+    "--we":"#EEE5FF","--head":"#DFD0FA"},
+  mono:  {label:"흑백", swatch:"#9E9E9E",
+    "--pink":"#3D3D3D","--pink-dark":"#1F1F1F","--hot":"#6E6E6E","--txt":"#555555","--txt-dark":"#2B2B2B",
+    "--bg":"#FAFAFA","--soft":"#F1F1F1","--sel":"#E8E8E8","--cell":"#F7F7F7","--cell2":"#FAFAFA","--cell3":"#F8F8F8",
+    "--card":"#FCFCFC","--line":"#D8D8D8","--line2":"#E1E1E1","--line3":"#DBDBDB","--line4":"#E4E4E4","--line5":"#E9E9E9",
+    "--we":"#EFEFEF","--head":"#E2E2E2"},
+};
+function applyTheme(name){
+  const t=THEMES[name]||THEMES.pink;
+  for(const k in t){ if(k.startsWith("--")) document.documentElement.style.setProperty(k, t[k]); }
+  // 흑백 모드는 무지개 색도 회색조로
+  RB  = (name==="mono") ? RB_GRAY  : RB_COLOR;
+  RBD = (name==="mono") ? RBD_GRAY : RBD_COLOR;
+}
+function renderThemeBtns(){
+  themeBtns.innerHTML="";
+  for(const name in THEMES){
+    const b=document.createElement("div");
+    b.className="tb"+(state.theme===name?" sel":"");
+    b.style.background=THEMES[name].swatch;
+    b.title=THEMES[name].label;
+    b.onclick=()=>{ state.theme=name; save(); applyTheme(name); renderThemeBtns(); renderAll(); };
+    themeBtns.appendChild(b);
+  }
+}
 
 let state = null;
 
@@ -348,6 +425,7 @@ function load(){
   }catch(e){ state = defaultState(); }
   if(state.showSat===undefined) state.showSat=true;
   if(state.showSun===undefined) state.showSun=true;
+  if(!state.theme) state.theme="pink";
 }
 function visibleDows(){
   const v=[0,1,2,3,4];
@@ -517,13 +595,6 @@ function renderDates(){
 }
 
 // ---------- 수정용 월별 달력 ----------
-let calEditOpen=false;
-function toggleCalEdit(){
-  calEditOpen=!calEditOpen;
-  calEditBox.style.display=calEditOpen?"block":"none";
-  calEditArrow.textContent=calEditOpen?"▲ 눌러서 닫기":"▼ 눌러서 열기";
-  if(calEditOpen) renderCalEdit();
-}
 function renderCalEdit(){
   calEditBox.innerHTML="";
   if(!state.start||!state.end) return;
@@ -549,14 +620,14 @@ function renderCalEdit(){
           const hid=rec?.hiddenRoutine||[];
           const remojis=state.routine[i].filter(it=>!hid.includes(it.cardId))
             .map(it=>cardById(it.cardId)?.emoji).filter(Boolean).join(" ");
-          let html=`<div class="d-row"><span class="d">${fmt(d)}</span><span class="re-top">${remojis}</span></div>`;
-          if(rec?.banner) html+=`<div class="bn">${esc(rec.banner)}</div>`;
+          let html=`<div class="d-row"><span class="d">${fmt(d)}</span><span class="re-top banner">${rec?.banner?esc(rec.banner):""}</span></div>`;
+          if(remojis) html+=`<div class="re-bottom">${remojis}</div>`;
           td.innerHTML=html;
           (rec?.items||[]).forEach((it,idx)=>{
             const c=cardById(it.cardId); if(!c) return;
             const ci=document.createElement("div"); ci.className="ci";
             ci.innerHTML=`<span>${c.emoji}</span><span>${esc(c.name)}</span>`+
-              (it.time?`<span style="color:#B5457A;font-weight:bold">${it.time}</span>`:"")+
+              (it.time?`<span style="color:var(--txt);font-weight:bold">${it.time}</span>`:"")+
               `<span class="x">✕</span>`;
             ci.querySelector(".x").onclick=(ev)=>{ ev.stopPropagation();
               rec.items.splice(idx,1); save(); renderAll(); };
@@ -595,6 +666,8 @@ function esc(s){ return String(s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;
 
 function renderPreview(){
   const area=printArea; area.innerHTML=""; calArea.innerHTML="";
+  monthlyPreviewWrap.style.display = state.makeMonthly ? "" : "none";
+  dailyPreviewWrap.style.display = state.makeDaily ? "" : "none";
   if(!state.start||!state.end) return;
   const start=pd(state.start), end=pd(state.end);
   if(start>end) return;
@@ -677,12 +750,13 @@ function monthPage(start,end){
           const hid=rec?.hiddenRoutine||[];
           const remojis=state.routine[i].filter(it=>!hid.includes(it.cardId))
             .map(it=>cardById(it.cardId)?.emoji).filter(Boolean).join(" ");
-          cell=`<div class="d-row"><span class="d">${fmt(cur)}</span><span class="re-top">${remojis}</span></div>`;
-          if(rec?.banner) cell+=`<div class="it" style="color:#E91E7C;font-weight:bold">${esc(rec.banner)}</div>`;
+          // 오른쪽 위는 '한 마디' 전용 (없으면 빈칸), 반복 이모지는 칸 아래쪽
+          cell=`<div class="d-row"><span class="d">${fmt(cur)}</span><span class="re-top banner">${rec?.banner?esc(rec.banner):""}</span></div>`;
           const its=(rec?.items||[]);
-          its.slice(0,4).forEach(it=>{ const c=cardById(it.cardId);
+          its.slice(0,3).forEach(it=>{ const c=cardById(it.cardId);
             if(c) cell+=`<div class="it">${c.emoji} ${esc(c.name)}</div>`; });
-          if(its.length>4) cell+=`<div class="it">…외 ${its.length-4}개</div>`;
+          if(its.length>3) cell+=`<div class="it">…외 ${its.length-3}개</div>`;
+          if(remojis) cell+=`<div class="re-bottom">${remojis}</div>`;
         }
         html+=`<td class="${cls}">${cell}</td>`;
       }
@@ -692,7 +766,7 @@ function monthPage(start,end){
   }
   t.innerHTML=html; pg.appendChild(t);
   const note=document.createElement("div");
-  note.style.cssText="text-align:center;margin-top:3mm;font-size:12px;color:#B5457A;font-weight:bold";
+  note.style.cssText="text-align:center;margin-top:3mm;font-size:12px;color:var(--txt);font-weight:bold";
   note.textContent="📌 날짜별 일정만 글씨로 표시돼요. 매주 하는 일정은 이모지로만 살짝 보여요 (뜻은 아래 참고!)";
   pg.appendChild(note);
 
@@ -779,7 +853,7 @@ function dayPage(d){
     items.forEach((it,i)=>{ const c=cardById(it.cardId); if(!c) return;
       const r=document.createElement("div"); r.className="cli";
       r.innerHTML=`<div class="box" style="border-color:${RBD[i%7]}"></div>
-        <div class="txt">${c.emoji} ${esc(c.name)}${it.time?` <b style="color:#B5457A">(${it.time})</b>`:""}</div>
+        <div class="txt">${c.emoji} ${esc(c.name)}${it.time?` <b style="color:var(--txt)">(${it.time})</b>`:""}</div>
         <span class="rm no-print" title="이 날만 빼기">✕</span>`;
       r.querySelector(".rm").onclick=()=>{
         if(it.src==="r"){
@@ -823,18 +897,21 @@ function dayPage(d){
 function doPrint(){ renderPreview(); window.print(); }
 function resetAll(){
   if(!confirm("모든 내용을 지우고 처음 상태로 되돌릴까요?")) return;
-  state=defaultState(); save(); renderAll(); bindOnce();
+  state=defaultState(); state.theme="pink"; save();
+  applyTheme(state.theme); renderThemeBtns(); renderAll(); bindOnce();
 }
 function bindOnce(){
   inTitle.value=state.title; inStart.value=state.start; inEnd.value=state.end;
   ckMonthly.checked=state.makeMonthly; ckWeekly.checked=state.makeWeekly; ckDaily.checked=state.makeDaily;
   ckSat.checked=state.showSat; ckSun.checked=state.showSun;
 }
-function renderAll(){ renderCards(); renderWeek(); renderDates(); renderPreview(); if(calEditOpen) renderCalEdit(); }
+function renderAll(){ renderCards(); renderWeek(); renderDates(); renderPreview(); renderCalEdit(); }
 
 load();
 buildTimeOptions(pickTime);
 renderPalette();
+applyTheme(state.theme);
+renderThemeBtns();
 bindBasics();
 bindPager();
 renderAll();
