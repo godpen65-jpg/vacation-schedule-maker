@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🌈 방학 일정표 만들기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pink:#E91E7C; --pink-dark:#C2185B; --hot:#FF4D9D;
+    --r0:#FFB3BA; --r1:#FFDFBA; --r2:#FFFFBA; --r3:#BAFFC9; --r4:#BAE1FF; --r5:#C9BAFF; --r6:#F1BAFF;
+    --d0:#FF6B7A; --d1:#FFA94D; --d2:#FFD43B; --d3:#51CF66; --d4:#339AF0; --d5:#845EF7; --d6:#F06595;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact; color-adjust:exact;}
+  body{font-family:"Jua","Malgun Gothic","맑은 고딕",sans-serif; background:#FFF5FA; color:#444;}
+
+  /* ---------- 편집 화면 ---------- */
+  .app-header{position:sticky; top:0; z-index:50; background:linear-gradient(90deg,#FFD1E6,#FFE9F4);
+    padding:14px 20px; display:flex; align-items:center; gap:12px; box-shadow:0 2px 8px rgba(233,30,124,.15);}
+  .app-header h1{font-size:20px; color:var(--pink);}
+  .app-header .spacer{flex:1;}
+  button{font-family:inherit; cursor:pointer; border:none; border-radius:10px; font-weight:bold;}
+  .btn-main{background:var(--pink); color:#fff; padding:10px 22px; font-size:15px;}
+  .btn-main:hover{background:var(--pink-dark);}
+  .btn-ghost{background:#fff; color:var(--pink); padding:10px 16px; font-size:13px; border:2px solid #F8C8DD;}
+  .btn-ghost:hover{background:#FFF0F7;}
+
+  main{max-width:1050px; margin:0 auto; padding:18px 16px 60px;}
+  section.panel{background:#fff; border:2px solid #F8C8DD; border-radius:16px; padding:18px 20px; margin-top:18px;}
+  section.panel h2{font-size:16px; color:var(--pink); margin-bottom:12px;}
+  .hint{font-size:12px; color:#999; margin-top:6px;}
+
+  .row{display:flex; flex-wrap:wrap; gap:14px; align-items:center;}
+  label.fld{display:flex; flex-direction:column; gap:4px; font-size:12px; color:#B5457A; font-weight:bold;}
+  input[type=text],input[type=date],select{font-family:inherit; font-size:14px; padding:8px 10px;
+    border:2px solid #F3D3E2; border-radius:8px; background:#FFFDFE;}
+  input[type=text]:focus,input[type=date]:focus,select:focus{outline:none; border-color:var(--hot);}
+  .chk{display:flex; align-items:center; gap:6px; font-size:14px; font-weight:bold; color:#7A1E4A;
+    background:#FFF0F7; padding:8px 14px; border-radius:10px; cursor:pointer; user-select:none;}
+  .chk input{width:18px; height:18px; accent-color:var(--pink);}
+
+  /* 일정 카드 */
+  .cards{display:flex; flex-wrap:wrap; gap:8px;}
+  .card{display:flex; align-items:center; gap:6px; background:#FFF7FB; border:2px solid #F3C8DC;
+    padding:7px 12px; border-radius:20px; font-size:14px; font-weight:bold; color:#555;}
+  .card .del{color:#D88; font-weight:bold; cursor:pointer; margin-left:2px; font-size:12px;}
+  .card .del:hover{color:#C0392B;}
+  .addcard{margin-top:14px; padding-top:14px; border-top:2px dashed #F3D3E2;}
+  .emoji-palette{display:flex; flex-wrap:wrap; gap:4px; margin:8px 0;}
+  .emoji-palette span{font-size:20px; padding:5px 7px; border-radius:8px; cursor:pointer; border:2px solid transparent;}
+  .emoji-palette span:hover{background:#FFF0F7;}
+  .emoji-palette span.sel{border-color:var(--hot); background:#FFE9F4;}
+
+  /* 주간 루틴 */
+  .week-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:8px;}
+  .day-col{border:2px solid #F3D3E2; border-radius:12px; overflow:hidden; background:#fff; min-height:120px;
+    display:flex; flex-direction:column;}
+  .day-col .day-head{padding:7px 4px; text-align:center; font-weight:bold; font-size:14px; color:#555;}
+  .day-col .items{flex:1; padding:6px; display:flex; flex-direction:column; gap:4px;}
+  .item-chip{display:flex; align-items:center; gap:4px; background:#FFFAFC; border:1.5px solid #F0D0E0;
+    border-radius:8px; padding:4px 6px; font-size:12px;}
+  .item-chip .t{color:#B5457A; font-weight:bold; font-size:11px;}
+  .item-chip .x{margin-left:auto; cursor:pointer; color:#D99; font-weight:bold; padding:0 3px;}
+  .item-chip .x:hover{color:#C0392B;}
+  .add-slot{margin:6px; padding:6px; border:2px dashed #F3C8DC; background:none; border-radius:8px;
+    color:var(--pink); font-size:13px;}
+  .add-slot:hover{background:#FFF0F7;}
+
+  /* 날짜별 일정 */
+  .day-editor{display:flex; flex-wrap:wrap; gap:14px; align-items:flex-end; margin-bottom:12px;}
+  .datelist{display:flex; flex-direction:column; gap:8px;}
+  .date-block{border:2px solid #F3D3E2; border-radius:12px; padding:10px 14px; background:#FFFDFE;}
+  .date-block .db-head{display:flex; align-items:center; gap:10px; font-weight:bold; color:#7A1E4A; font-size:14px;}
+  .date-block .db-banner{font-size:12px; color:var(--pink);}
+  .date-block .items{display:flex; flex-wrap:wrap; gap:5px; margin-top:7px;}
+
+  /* 모달 */
+  .modal-bg{display:none; position:fixed; inset:0; background:rgba(120,30,80,.35); z-index:100;
+    align-items:center; justify-content:center;}
+  .modal-bg.on{display:flex;}
+  .modal{background:#fff; border-radius:18px; padding:22px 24px; width:min(560px,92vw); max-height:86vh; overflow:auto;}
+  .modal h3{color:var(--pink); font-size:16px; margin-bottom:12px;}
+  .pick-cards{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:14px;}
+  .pick-cards .card{cursor:pointer;}
+  .pick-cards .card.sel{border-color:var(--hot); background:#FFE9F4; color:#7A1E4A;}
+  .modal .row2{display:flex; gap:10px; align-items:center; margin-bottom:16px;}
+  .modal-btns{display:flex; gap:10px; justify-content:flex-end;}
+
+  /* ---------- 출력(미리보기+인쇄) ---------- */
+  #previewWrap{margin-top:18px; margin-bottom:18px;}
+  #previewWrap h2{color:var(--pink); font-size:17px; margin-bottom:10px;}
+  .page{width:297mm; min-height:210mm; background:#fff; margin:0 auto 14px; padding:8mm 10mm;
+    box-shadow:0 3px 14px rgba(0,0,0,.12); position:relative; overflow:hidden;}
+  @media screen{
+    .page.hide-screen{display:none;}
+  }
+  @media print{
+    .page{zoom:1 !important;}
+  }
+  .pager{display:flex; align-items:center; gap:10px; flex-wrap:wrap; background:#fff;
+    border:2px solid #F8C8DD; border-radius:14px; padding:10px 14px; margin-bottom:12px;}
+  .pager .lbl{font-weight:bold; color:#7A1E4A; font-size:14px; min-width:170px; text-align:center;}
+  .rm{margin-left:2mm; color:#E58; font-weight:bold; cursor:pointer; font-size:12px;
+    border:1.5px solid #F5C0D2; border-radius:50%; width:6mm; height:6mm; flex:none;
+    display:flex; align-items:center; justify-content:center; background:#fff;}
+  .rm:hover{background:#FFE9F4; color:#C0392B;}
+  .hidden-bar{margin-top:3mm; font-size:11px; color:#B5457A; background:#FFF0F7;
+    border:1.5px dashed #F3C8DC; border-radius:2.5mm; padding:2.5mm 3mm;}
+  .hidden-bar button{background:#fff; border:1.5px solid #F3C8DC; border-radius:10px;
+    padding:2px 8px; font-size:11px; color:#7A1E4A; margin:1px 2px;}
+  .hidden-bar button:hover{background:#FFE9F4;}
+
+  .phead{display:flex; align-items:flex-start; gap:2mm;}
+  .phead .side{width:42mm; flex:none;}
+  .phead .mid{flex:1;}
+  .p-title{text-align:center; font-size:24px; font-weight:bold; color:var(--pink); padding-top:2mm;}
+  .p-banner{text-align:center; font-size:13px; font-weight:bold; color:#B5457A; margin-top:2mm;}
+  .stamp{text-align:center;}
+  .stamp .lbl{font-size:10px; font-weight:bold; color:var(--pink); margin-bottom:1.5mm;}
+  .stamp .box{width:38mm; height:20mm; border:2.5px dashed var(--hot); border-radius:4mm; background:#fff; margin-left:auto;}
+
+  table.wk{width:100%; border-collapse:collapse; margin-top:5mm; table-layout:fixed;}
+  table.wk th{padding:3mm 1mm; font-size:17px; color:#555; border:1.5px solid #fff;}
+  table.wk th .tag{display:block; font-size:12px; font-weight:normal; color:#777; margin-top:1mm;}
+  table.wk th.today{color:#fff; outline:3px solid var(--pink-dark); outline-offset:-3px;}
+  table.wk th.today .tag{color:#FFE9F4;}
+  table.wk td{border:1.5px solid #F0D0E0; background:#fff; vertical-align:middle; text-align:center;
+    padding:2mm 1mm; font-size:14px; color:#666; height:20mm; word-break:keep-all;}
+  table.wk td.today{background:#FFE9F4; outline:3px solid var(--pink-dark); outline-offset:-3px;
+    color:#7A1E4A; font-weight:bold;}
+  table.wk td div{margin:.6mm 0;}
+
+  .bottom{display:flex; gap:5mm; margin-top:5mm;}
+  .bcol{flex:1; border:2px solid #F8C8DD; border-radius:5mm; padding:5mm 6mm; min-height:105mm;}
+  .bcol.left{background:#FFF7FB;}
+  .bcol.right{background:#FFF9F5;}
+  .bcol h4{color:var(--pink); font-size:17px; margin-bottom:4mm;}
+  .timeline{display:flex; flex-direction:column; gap:2.5mm;}
+  .timeline .tl{display:flex; align-items:center; gap:3mm; background:#fff; border:2px solid var(--r0);
+    border-radius:2.5mm; padding:2.5mm 3.5mm; font-size:16px;}
+  .timeline .tl .tm{font-weight:bold; color:#B5457A; min-width:16mm; font-size:15px;}
+  .cl{display:flex; flex-direction:column; gap:2.5mm;}
+  .cl .cli{display:flex; align-items:center; gap:3mm;}
+  .cl .box{width:8mm; height:8mm; border:2.5px solid var(--d0); border-radius:2mm; background:#fff; flex:none;}
+  .cl .txt{flex:1; background:#FFFAFC; border:1.5px solid #F5D7E6; border-radius:2.5mm;
+    padding:2.5mm 3.5mm; font-size:16px;}
+  .empty-note{color:#B99; font-size:12px; background:#fff; border:2px dashed #F3D3E2;
+    border-radius:2.5mm; padding:4mm; text-align:center;}
+
+  /* 월별 달력 */
+  table.cal{width:100%; border-collapse:collapse; margin-top:3mm; table-layout:fixed;}
+  table.cal th{padding:2mm; color:#fff; font-size:16px; border:1.5px solid #fff;}
+  table.cal td{border:1.5px solid #fff; background:#FFF7FB; height:21mm; vertical-align:top;
+    padding:1.2mm 2mm; font-size:13px; color:#555;}
+  .d-row{display:flex; align-items:flex-start; justify-content:space-between; gap:2mm;}
+  .d-row .d{font-size:15px; font-weight:bold; color:#333;}
+  .d-row .re-top{font-size:13px; opacity:.8; text-align:right; white-space:nowrap;}
+  table.cal td.out{background:#F5F5F5;}
+  table.cal td.we{background:#FFEAF4;}
+  table.cal td div.it{margin-top:.5mm; word-break:keep-all; line-height:1.25;}
+
+  .cal-legend{margin-top:2.5mm; font-size:12px; color:#666; background:#FFF7FB;
+    border:1.5px dashed #F3C8DC; border-radius:2.5mm; padding:2mm 4mm; line-height:1.6;}
+  .cal-legend b{color:var(--pink); font-size:12px;}
+  .cal-legend span.pair{display:inline-block; margin-right:4mm; white-space:nowrap;}
+
+  /* 수정용 월별 달력 */
+  #calEditBox table{width:100%; border-collapse:collapse; table-layout:fixed;}
+  #calEditBox th{padding:7px; color:#fff; font-size:13px; border:1.5px solid #fff;}
+  #calEditBox td{border:1.5px solid #fff; background:#FFF7FB; height:86px; vertical-align:top;
+    padding:5px 6px; font-size:11px; color:#555; cursor:pointer;}
+  #calEditBox td:hover{outline:2.5px solid var(--hot); outline-offset:-2.5px;}
+  #calEditBox td.out{background:#F5F5F5; cursor:default;}
+  #calEditBox td.out:hover{outline:none;}
+  #calEditBox td.we{background:#FFEAF4;}
+  #calEditBox td .d-row .d{font-size:12px; font-weight:bold; color:#333;}
+  #calEditBox td .d-row .re-top{font-size:12px; opacity:.75; white-space:nowrap;}
+  #calEditBox td .bn{color:var(--pink); font-weight:bold; margin-top:2px; word-break:keep-all;}
+  #calEditBox td .ci{display:flex; align-items:center; gap:3px; margin-top:2px;
+    background:#fff; border:1px solid #F0D0E0; border-radius:6px; padding:1px 4px;}
+  #calEditBox td .ci .x{margin-left:auto; color:#D99; font-weight:bold; padding:0 2px;}
+  #calEditBox td .ci .x:hover{color:#C0392B;}
+  .cal-toggle{float:right; font-size:13px; color:#B5457A; font-weight:normal;}
+
+  @media print{
+    body{background:#fff;}
+    .no-print{display:none !important;}
+    #previewWrap h2{display:none;}
+    main{max-width:none; padding:0; margin:0;}
+    #previewWrap{margin:0;}
+    .page{box-shadow:none; margin:0 auto; page-break-after:always;}
+    .page:last-child{page-break-after:auto;}
+  }
+  @page{size:A4 landscape; margin:0;}
+</style>
+</head>
+<body>
+
+<header class="app-header no-print">
+  <h1>🌈 방학 일정표 만들기</h1>
+  <div class="spacer"></div>
+  <button class="btn-ghost" onclick="resetAll()">전체 지우기</button>
+  <button class="btn-main" onclick="doPrint()">🖨️ 인쇄하기</button>
+</header>
+
+<main>
+
+  <section class="panel no-print">
+    <h2>① 기본 설정</h2>
+    <div class="row">
+      <label class="fld">일정표 제목
+        <input type="text" id="inTitle" style="width:260px" placeholder="예: 서현이의 반짝반짝 여름방학">
+      </label>
+      <label class="fld">시작일 <input type="date" id="inStart"></label>
+      <label class="fld">마지막날 <input type="date" id="inEnd"></label>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <label class="chk"><input type="checkbox" id="ckMonthly"> 📅 월별 달력 만들기</label>
+      <label class="chk"><input type="checkbox" id="ckWeekly" checked> 🌈 주간 일정 넣기</label>
+      <label class="chk"><input type="checkbox" id="ckDaily" checked> 📄 하루 한 장 만들기</label>
+      <label class="chk"><input type="checkbox" id="ckSat" checked> 토요일 포함</label>
+      <label class="chk"><input type="checkbox" id="ckSun" checked> 일요일 포함</label>
+    </div>
+    <p class="hint">체크한 것만 아래 미리보기와 인쇄에 나와요.</p>
+  </section>
+
+  <section class="panel no-print">
+    <h2>② 날짜별 일정 (특별한 날)</h2>
+    <div class="day-editor">
+      <label class="fld">날짜 <input type="date" id="inDayDate"></label>
+      <label class="fld">그날의 한 마디 (선택)
+        <input type="text" id="inDayBanner" style="width:240px" placeholder="예: 여행 중이에요! / 썸머스쿨 첫날!">
+      </label>
+      <button class="btn-main" onclick="openPickerForDay()">+ 일정 추가</button>
+      <button class="btn-ghost" onclick="saveBannerOnly()">한 마디만 저장</button>
+    </div>
+    <div class="datelist" id="dateList"></div>
+    <p class="hint">여행, 학교 프로그램, 특강처럼 특정 날짜에만 있는 일정을 넣어요. 월별 달력에는 이 일정들이 표시돼요!</p>
+  </section>
+
+  <section id="previewWrap">
+    <h2 class="no-print">👀 미리보기 <span style="font-size:12px; color:#999; font-weight:normal">— 인쇄하면 A4 가로 용지에 이대로 나와요</span></h2>
+    <div id="calArea"></div>
+    <div class="pager no-print">
+      <button class="btn-ghost" id="pgPrev">◀ 이전</button>
+      <span class="lbl" id="pgLabel"></span>
+      <button class="btn-ghost" id="pgNext">다음 ▶</button>
+      <label class="fld" style="flex-direction:row; align-items:center; gap:6px">날짜로 가기
+        <input type="date" id="pgDate"></label>
+      <span class="hint">페이지 위 ✕를 누르면 그 날만 그 일정을 뺄 수 있어요 (인쇄에는 ✕ 안 나와요)</span>
+    </div>
+    <div id="printArea"></div>
+  </section>
+
+  <section class="panel no-print">
+    <h2>③ 일정 카드 만들기</h2>
+    <div class="cards" id="cardList"></div>
+    <div class="addcard">
+      <b style="color:#B5457A; font-size:13px">새 카드 추가</b>
+      <div class="emoji-palette" id="emojiPalette"></div>
+      <div class="row">
+        <input type="text" id="inEmoji" style="width:70px; text-align:center; font-size:18px" placeholder="이모지">
+        <input type="text" id="inCardName" style="width:220px" placeholder="일정 이름 (예: 피아노 학원)">
+        <button class="btn-main" onclick="addCard()">+ 카드 추가</button>
+      </div>
+      <p class="hint">위에서 이모지를 고르거나 직접 붙여넣어도 돼요. 만든 카드는 클릭 한 번으로 일정에 들어가요!</p>
+    </div>
+  </section>
+
+  <section class="panel no-print">
+    <h2 style="cursor:pointer; user-select:none" onclick="toggleCalEdit()">④ 월별 일정 달력
+      <span class="cal-toggle" id="calEditArrow">▼ 눌러서 열기</span></h2>
+    <div id="calEditBox" style="display:none; margin-top:10px"></div>
+    <p class="hint">날짜 칸을 누르면 그 날 일정을 바로 넣을 수 있어요. 반복 일정은 이모지로만 살짝 보여요.</p>
+  </section>
+
+  <section class="panel no-print">
+    <h2>⑤ 주간 일정 (매주 반복되는 것)</h2>
+    <div class="week-grid" id="weekGrid"></div>
+    <p class="hint">요일 아래 <b>+ 추가</b>를 누르고 카드를 고르면 돼요. 시간은 30분 단위로 고를 수 있어요.</p>
+  </section>
+</main>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3 id="modalTitle">일정 고르기</h3>
+    <div class="pick-cards" id="pickCards"></div>
+    <div class="row2">
+      <b style="font-size:13px; color:#B5457A">시간</b>
+      <select id="pickTime"></select>
+      <span class="hint">시간이 없으면 "시간 없음" 그대로 두세요.</span>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-ghost" onclick="closePicker()">취소</button>
+      <button class="btn-main" onclick="confirmPicker()">추가하기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const LS_KEY = "vacationScheduler.v1";
+const DOW = ["월","화","수","목","금","토","일"];
+const RB   = ["#FFB3BA","#FFDFBA","#FFFFBA","#BAFFC9","#BAE1FF","#C9BAFF","#F1BAFF"];
+const RBD  = ["#FF6B7A","#FFA94D","#FFD43B","#51CF66","#339AF0","#845EF7","#F06595"];
+const PALETTE = ["📱","💻","🧋","🧑‍🏫","🎨","⛳","🏫","✏️","📖","📚","🎹","🎻","🥁","🎤","🩰","🥋","⚽","🏀","⚾","🏊","🚴","🛼","🧩","♟️","🔬","🧪","➕","📐","🌈","🧳","🎬","🎮","🐶","🌸","⭐","🍀","🏛️","💪","🗣️","🇺🇸"];
+
+let state = null;
+
+function defaultState(){
+  const cards = [
+    {id:1, emoji:"📱", name:"밀크티 학습기"},
+    {id:2, emoji:"🧑‍🏫", name:"밀크티쌤 수업"},
+    {id:3, emoji:"💻", name:"나오나우 화상수업"},
+    {id:4, emoji:"📖", name:"토글 문해력"},
+    {id:5, emoji:"✏️", name:"토글 숙제"},
+    {id:6, emoji:"🏫", name:"랭콘어학원"},
+    {id:7, emoji:"📝", name:"어학원 숙제"},
+    {id:8, emoji:"🎨", name:"미술"},
+    {id:9, emoji:"⛳", name:"골프"},
+    {id:10, emoji:"🌈", name:"자유시간"},
+    {id:11, emoji:"🧳", name:"여행"},
+  ];
+  return {
+    title:"서현이의 반짝반짝 여름방학",
+    start:"2026-07-16", end:"2026-08-15",
+    makeMonthly:false, makeWeekly:true, makeDaily:true,
+    showSat:true, showSun:true,
+    nextId:100, cards,
+    routine:{0:[{cardId:6,time:"17:00"},{cardId:7,time:""}],
+             1:[{cardId:1,time:""}],
+             2:[{cardId:2,time:""},{cardId:3,time:""},{cardId:4,time:""}],
+             3:[{cardId:1,time:""},{cardId:5,time:""}],
+             4:[{cardId:6,time:"17:00"},{cardId:7,time:""}],
+             5:[{cardId:1,time:""},{cardId:9,time:"10:20"},{cardId:8,time:"12:00"}],
+             6:[{cardId:10,time:""}]},
+    days:{}
+  };
+}
+
+function load(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    state = raw ? JSON.parse(raw) : defaultState();
+  }catch(e){ state = defaultState(); }
+  if(state.showSat===undefined) state.showSat=true;
+  if(state.showSun===undefined) state.showSun=true;
+}
+function visibleDows(){
+  const v=[0,1,2,3,4];
+  if(state.showSat) v.push(5);
+  if(state.showSun) v.push(6);
+  return v;
+}
+function save(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+
+// ---------- 날짜 도우미 ----------
+function pd(s){ const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); }
+function iso(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function dowIdx(d){ return (d.getDay()+6)%7; }   // 월=0 … 일=6
+function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+function fmt(d){ return (d.getMonth()+1)+"/"+d.getDate(); }
+function cardById(id){ return state.cards.find(c=>c.id===id); }
+
+// ---------- ① 기본 설정 ----------
+function bindBasics(){
+  inTitle.value = state.title; inStart.value = state.start; inEnd.value = state.end;
+  ckMonthly.checked = state.makeMonthly; ckWeekly.checked = state.makeWeekly; ckDaily.checked = state.makeDaily;
+  ckSat.checked = state.showSat; ckSun.checked = state.showSun;
+  [inTitle,inStart,inEnd].forEach(el=>el.addEventListener("change",()=>{
+    state.title=inTitle.value; state.start=inStart.value; state.end=inEnd.value; save(); renderPreview();
+  }));
+  [[ckMonthly,"makeMonthly"],[ckWeekly,"makeWeekly"],[ckDaily,"makeDaily"]].forEach(([el,key])=>{
+    el.addEventListener("change",()=>{ state[key]=el.checked; save(); renderPreview(); });
+  });
+  [[ckSat,"showSat"],[ckSun,"showSun"]].forEach(([el,key])=>{
+    el.addEventListener("change",()=>{ state[key]=el.checked; save(); renderAll(); });
+  });
+}
+
+// ---------- ② 일정 카드 ----------
+function renderCards(){
+  cardList.innerHTML = "";
+  state.cards.forEach(c=>{
+    const el = document.createElement("div");
+    el.className = "card";
+    el.innerHTML = `<span>${c.emoji}</span><span>${esc(c.name)}</span><span class="del" title="삭제">✕</span>`;
+    el.querySelector(".del").onclick = ()=>{
+      if(!confirm(`'${c.emoji} ${c.name}' 카드를 지울까요?\n(이미 넣어둔 일정에서도 빠져요)`)) return;
+      state.cards = state.cards.filter(x=>x.id!==c.id);
+      for(const k in state.routine) state.routine[k]=state.routine[k].filter(it=>it.cardId!==c.id);
+      for(const k in state.days) state.days[k].items=state.days[k].items.filter(it=>it.cardId!==c.id);
+      save(); renderAll();
+    };
+    cardList.appendChild(el);
+  });
+}
+function renderPalette(){
+  emojiPalette.innerHTML="";
+  PALETTE.forEach(e=>{
+    const s=document.createElement("span"); s.textContent=e;
+    s.onclick=()=>{ inEmoji.value=e;
+      emojiPalette.querySelectorAll("span").forEach(x=>x.classList.remove("sel")); s.classList.add("sel"); };
+    emojiPalette.appendChild(s);
+  });
+}
+function addCard(){
+  const emoji=inEmoji.value.trim()||"⭐", name=inCardName.value.trim();
+  if(!name){ alert("일정 이름을 적어주세요!"); return; }
+  state.cards.push({id:state.nextId++, emoji, name});
+  inCardName.value=""; save(); renderCards(); renderPreview();
+}
+
+// ---------- 시간 선택 ----------
+function buildTimeOptions(sel){
+  sel.innerHTML = `<option value="">시간 없음</option>`;
+  for(let h=7; h<=22; h++) for(const m of ["00","30"]){
+    if(h===22 && m==="30") continue;
+    const t = String(h).padStart(2,"0")+":"+m;
+    sel.innerHTML += `<option value="${t}">${t}</option>`;
+  }
+}
+
+// ---------- 모달 ----------
+let pickCtx=null, pickSel=null;
+function openPicker(ctx,title){
+  pickCtx=ctx; pickSel=null;
+  modalTitle.textContent=title;
+  pickCards.innerHTML="";
+  state.cards.forEach(c=>{
+    const el=document.createElement("div");
+    el.className="card"; el.innerHTML=`<span>${c.emoji}</span><span>${esc(c.name)}</span>`;
+    el.onclick=()=>{ pickSel=c.id;
+      pickCards.querySelectorAll(".card").forEach(x=>x.classList.remove("sel")); el.classList.add("sel"); };
+    pickCards.appendChild(el);
+  });
+  pickTime.value="";
+  modalBg.classList.add("on");
+}
+function closePicker(){ modalBg.classList.remove("on"); }
+function confirmPicker(){
+  if(pickSel==null){ alert("카드를 하나 골라주세요!"); return; }
+  const item={cardId:pickSel, time:pickTime.value};
+  if(pickCtx.type==="routine"){ state.routine[pickCtx.dow].push(item); }
+  else{
+    const d=pickCtx.date;
+    if(!state.days[d]) state.days[d]={banner:"", items:[]};
+    state.days[d].items.push(item);
+    if(inDayBanner.value.trim()) state.days[d].banner=inDayBanner.value.trim();
+  }
+  save(); closePicker(); renderAll();
+}
+
+// ---------- ③ 주간 루틴 ----------
+function renderWeek(){
+  weekGrid.innerHTML="";
+  const dows=visibleDows();
+  weekGrid.style.gridTemplateColumns=`repeat(${dows.length},1fr)`;
+  for(const i of dows){
+    const col=document.createElement("div"); col.className="day-col";
+    col.innerHTML=`<div class="day-head" style="background:${RB[i]}">${DOW[i]}</div><div class="items"></div>`;
+    const box=col.querySelector(".items");
+    state.routine[i].forEach((it,idx)=>{
+      const c=cardById(it.cardId); if(!c) return;
+      const chip=document.createElement("div"); chip.className="item-chip";
+      chip.innerHTML=`<span>${esc(c.name)}</span>`+
+        (it.time?`<span class="t">${it.time}</span>`:"")+`<span class="x">✕</span>`;
+      chip.querySelector(".x").onclick=()=>{ state.routine[i].splice(idx,1); save(); renderAll(); };
+      box.appendChild(chip);
+    });
+    const add=document.createElement("button"); add.className="add-slot"; add.textContent="+ 추가";
+    add.onclick=()=>openPicker({type:"routine",dow:i},`${DOW[i]}요일마다 하는 일정 고르기`);
+    col.appendChild(add);
+    weekGrid.appendChild(col);
+  }
+}
+
+// ---------- ④ 날짜별 ----------
+function openPickerForDay(){
+  if(!inDayDate.value){ alert("날짜를 먼저 골라주세요!"); return; }
+  openPicker({type:"day",date:inDayDate.value},`${inDayDate.value.slice(5).replace("-","/")} 일정 고르기`);
+}
+function saveBannerOnly(){
+  if(!inDayDate.value){ alert("날짜를 먼저 골라주세요!"); return; }
+  const d=inDayDate.value;
+  if(!state.days[d]) state.days[d]={banner:"",items:[]};
+  state.days[d].banner=inDayBanner.value.trim();
+  save(); renderAll();
+}
+function renderDates(){
+  dateList.innerHTML="";
+  Object.keys(state.days).sort().forEach(dk=>{
+    const rec=state.days[dk];
+    if(!rec.items.length && !rec.banner && !(rec.hiddenRoutine||[]).length){ delete state.days[dk]; return; }
+    if(!rec.items.length && !rec.banner) return; // 반복만 뺀 날은 목록에 안 보여줌
+    const d=pd(dk);
+    const block=document.createElement("div"); block.className="date-block";
+    block.innerHTML=`<div class="db-head"><span>📌 ${fmt(d)} (${DOW[dowIdx(d)]})</span>`+
+      (rec.banner?`<span class="db-banner">"${esc(rec.banner)}"</span>`:"")+
+      `<span style="flex:1"></span><button class="btn-ghost" style="padding:4px 10px;font-size:11px">이 날 지우기</button></div>
+       <div class="items"></div>`;
+    block.querySelector("button").onclick=()=>{ delete state.days[dk]; save(); renderAll(); };
+    const box=block.querySelector(".items");
+    rec.items.forEach((it,idx)=>{
+      const c=cardById(it.cardId); if(!c) return;
+      const chip=document.createElement("div"); chip.className="item-chip";
+      chip.innerHTML=`<span>${c.emoji}</span><span>${esc(c.name)}</span>`+
+        (it.time?`<span class="t">${it.time}</span>`:"")+`<span class="x">✕</span>`;
+      chip.querySelector(".x").onclick=()=>{ rec.items.splice(idx,1); save(); renderAll(); };
+      box.appendChild(chip);
+    });
+    dateList.appendChild(block);
+  });
+}
+
+// ---------- 수정용 월별 달력 ----------
+let calEditOpen=false;
+function toggleCalEdit(){
+  calEditOpen=!calEditOpen;
+  calEditBox.style.display=calEditOpen?"block":"none";
+  calEditArrow.textContent=calEditOpen?"▲ 눌러서 닫기":"▼ 눌러서 열기";
+  if(calEditOpen) renderCalEdit();
+}
+function renderCalEdit(){
+  calEditBox.innerHTML="";
+  if(!state.start||!state.end) return;
+  const start=pd(state.start), end=pd(state.end);
+  if(start>end) return;
+  const dows=visibleDows();
+  const t=document.createElement("table");
+  const thead=document.createElement("tr");
+  thead.innerHTML=dows.map(i=>`<th style="background:${RBD[i]}">${DOW[i]}</th>`).join("");
+  t.appendChild(thead);
+  let cur=addDays(start,-dowIdx(start));
+  while(cur<=end){
+    const tr=document.createElement("tr");
+    for(let i=0;i<7;i++){
+      const d=new Date(cur);
+      if(dows.includes(i)){
+        const td=document.createElement("td");
+        const inRange = d>=start && d<=end;
+        td.className = !inRange?"out":(i>=5?"we":"");
+        if(inRange){
+          const dk=iso(d);
+          const rec=state.days[dk];
+          const hid=rec?.hiddenRoutine||[];
+          const remojis=state.routine[i].filter(it=>!hid.includes(it.cardId))
+            .map(it=>cardById(it.cardId)?.emoji).filter(Boolean).join(" ");
+          let html=`<div class="d-row"><span class="d">${fmt(d)}</span><span class="re-top">${remojis}</span></div>`;
+          if(rec?.banner) html+=`<div class="bn">${esc(rec.banner)}</div>`;
+          td.innerHTML=html;
+          (rec?.items||[]).forEach((it,idx)=>{
+            const c=cardById(it.cardId); if(!c) return;
+            const ci=document.createElement("div"); ci.className="ci";
+            ci.innerHTML=`<span>${c.emoji}</span><span>${esc(c.name)}</span>`+
+              (it.time?`<span style="color:#B5457A;font-weight:bold">${it.time}</span>`:"")+
+              `<span class="x">✕</span>`;
+            ci.querySelector(".x").onclick=(ev)=>{ ev.stopPropagation();
+              rec.items.splice(idx,1); save(); renderAll(); };
+            td.appendChild(ci);
+          });
+          td.onclick=()=>{
+            inDayDate.value=dk;
+            inDayBanner.value=state.days[dk]?.banner||"";
+            openPicker({type:"day",date:dk},`${fmt(d)} (${DOW[dowIdx(d)]}) 일정 넣기`);
+          };
+        }
+        tr.appendChild(td);
+      }
+      cur=addDays(cur,1);
+    }
+    t.appendChild(tr);
+  }
+  calEditBox.appendChild(t);
+}
+
+// ---------- 출력 ----------
+function ensureDay(dk){
+  if(!state.days[dk]) state.days[dk]={banner:"", items:[]};
+  return state.days[dk];
+}
+function itemsForDate(d){
+  const rec = state.days[iso(d)];
+  const hidden = rec?.hiddenRoutine||[];
+  const routine = state.routine[dowIdx(d)]
+    .filter(it=>!hidden.includes(it.cardId))
+    .map(it=>({...it, src:"r"}));
+  const daily = (rec?.items||[]).map((it,idx)=>({...it, src:"d", idx}));
+  return daily.concat(routine);
+}
+function esc(s){ return String(s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
+
+function renderPreview(){
+  const area=printArea; area.innerHTML=""; calArea.innerHTML="";
+  if(!state.start||!state.end) return;
+  const start=pd(state.start), end=pd(state.end);
+  if(start>end) return;
+
+  if(state.makeMonthly) calArea.appendChild(monthPage(start,end));
+  if(state.makeDaily){
+    const dows=visibleDows();
+    for(let d=new Date(start); d<=end; d=addDays(d,1)){
+      if(dows.includes(dowIdx(d))) area.appendChild(dayPage(d));
+    }
+  }
+  applyPager();
+  fitPreviewZoom();
+}
+
+// 미리보기 페이지 폭을 다른 입력 박스들과 같은 가로 길이로 자동 확대
+function fitPreviewZoom(){
+  const ref = document.querySelector("main .panel") || document.querySelector("main");
+  if(!ref) return;
+  const targetW = ref.getBoundingClientRect().width;
+  if(!targetW) return;
+  const pageNativeWidthPx = 297 * 96 / 25.4; // mm -> px (297mm 페이지 원본 폭)
+  const z = Math.max(0.3, Math.min(1, targetW / pageNativeWidthPx));
+  document.querySelectorAll(".page").forEach(p=>{ p.style.zoom = z; });
+}
+window.addEventListener("resize", fitPreviewZoom);
+
+// ---------- 미리보기 한 장씩 넘기기 ----------
+let curKey=null;
+function pagerPages(){ return [...printArea.querySelectorAll(".page")]; }
+function applyPager(){
+  const pages=pagerPages();
+  if(!pages.length){ pgLabel.textContent="페이지 없음"; return; }
+  let idx=pages.findIndex(p=>p.dataset.date===curKey);
+  if(idx<0) idx=0;
+  showPage(idx);
+}
+function showPage(idx){
+  const pages=pagerPages();
+  idx=Math.max(0, Math.min(idx, pages.length-1));
+  pages.forEach((p,j)=>p.classList.toggle("hide-screen", j!==idx));
+  const p=pages[idx];
+  curKey=p.dataset.date;
+  const title=p.dataset.date==="calendar" ? "📅 월별 달력"
+    : p.querySelector(".p-title")?.textContent.replace(/🌈/g,"").trim();
+  pgLabel.textContent=title;
+  if(p.dataset.date && p.dataset.date!=="calendar") pgDate.value=p.dataset.date;
+}
+function bindPager(){
+  pgPrev.onclick=()=>{ const pages=pagerPages();
+    const i=pages.findIndex(p=>p.dataset.date===curKey); showPage(i-1); };
+  pgNext.onclick=()=>{ const pages=pagerPages();
+    const i=pages.findIndex(p=>p.dataset.date===curKey); showPage(i+1); };
+  pgDate.onchange=()=>{
+    const pages=pagerPages();
+    const i=pages.findIndex(p=>p.dataset.date===pgDate.value);
+    if(i>=0) showPage(i);
+    else alert("그 날짜의 페이지가 없어요! (기간 밖이거나 뺀 요일이에요)");
+  };
+}
+
+function monthPage(start,end){
+  const pg=document.createElement("div"); pg.className="page";
+  pg.dataset.date="calendar";
+  pg.innerHTML=`<div class="p-title">🌈 ${esc(state.title)} 🌈</div>
+    <div class="p-banner">${fmt(start)} (${DOW[dowIdx(start)]}) ~ ${fmt(end)} (${DOW[dowIdx(end)]})</div>`;
+  const dows=visibleDows();
+  const t=document.createElement("table"); t.className="cal";
+  let html="<tr>"+dows.map(i=>`<th style="background:${RBD[i]}">${DOW[i]}</th>`).join("")+"</tr>";
+  let cur=addDays(start,-dowIdx(start));
+  while(cur<=end){
+    html+="<tr>";
+    for(let i=0;i<7;i++){
+      const inRange = cur>=start && cur<=end;
+      if(dows.includes(i)){
+        const cls = !inRange?"out":(i>=5?"we":"");
+        let cell="";
+        if(inRange){
+          const rec=state.days[iso(cur)];
+          const hid=rec?.hiddenRoutine||[];
+          const remojis=state.routine[i].filter(it=>!hid.includes(it.cardId))
+            .map(it=>cardById(it.cardId)?.emoji).filter(Boolean).join(" ");
+          cell=`<div class="d-row"><span class="d">${fmt(cur)}</span><span class="re-top">${remojis}</span></div>`;
+          if(rec?.banner) cell+=`<div class="it" style="color:#E91E7C;font-weight:bold">${esc(rec.banner)}</div>`;
+          const its=(rec?.items||[]);
+          its.slice(0,4).forEach(it=>{ const c=cardById(it.cardId);
+            if(c) cell+=`<div class="it">${c.emoji} ${esc(c.name)}</div>`; });
+          if(its.length>4) cell+=`<div class="it">…외 ${its.length-4}개</div>`;
+        }
+        html+=`<td class="${cls}">${cell}</td>`;
+      }
+      cur=addDays(cur,1);
+    }
+    html+="</tr>";
+  }
+  t.innerHTML=html; pg.appendChild(t);
+  const note=document.createElement("div");
+  note.style.cssText="text-align:center;margin-top:3mm;font-size:12px;color:#B5457A;font-weight:bold";
+  note.textContent="📌 날짜별 일정만 글씨로 표시돼요. 매주 하는 일정은 이모지로만 살짝 보여요 (뜻은 아래 참고!)";
+  pg.appendChild(note);
+
+  // 달력 칸에 이모지만 나온 반복 일정이 무슨 뜻인지 설명하는 범례
+  const usedIds=new Set();
+  dows.forEach(i=>{ state.routine[i].forEach(it=>usedIds.add(it.cardId)); });
+  const pairs=[...usedIds].map(id=>cardById(id)).filter(Boolean)
+    .map(c=>`<span class="pair">${c.emoji} : ${esc(c.name)}</span>`).join(" ");
+  if(pairs){
+    const legend=document.createElement("div");
+    legend.className="cal-legend";
+    legend.innerHTML=`<b>💡 이모지 안내</b><br>${pairs}`;
+    pg.appendChild(legend);
+  }
+  return pg;
+}
+
+function weeklyTable(today){
+  const monday=addDays(today,-dowIdx(today));
+  const dows=visibleDows();
+  const t=document.createElement("table"); t.className="wk";
+  let h="<tr>";
+  for(const i of dows){
+    const d=addDays(monday,i);
+    const isT = iso(d)===iso(today);
+    const banner=state.days[iso(d)]?.banner||"";
+    h+=`<th class="${isT?"today":""}" style="background:${isT?RBD[i]:RB[i]}">
+      ${isT?"★ ":""}${DOW[i]} ${fmt(d)}${banner?`<span class="tag">${esc(banner)}</span>`:""}</th>`;
+  }
+  h+="</tr><tr>";
+  for(const i of dows){
+    const d=addDays(monday,i);
+    const isT = iso(d)===iso(today);
+    const inRange = d>=pd(state.start)&&d<=pd(state.end);
+    let cell="";
+    if(inRange){
+      itemsForDate(d).slice(0,4).forEach(it=>{ const c=cardById(it.cardId);
+        if(c) cell+=`<div>${esc(c.name)}</div>`; });
+    } else cell=`<div style="color:#ccc">-</div>`;
+    h+=`<td class="${isT?"today":""}">${cell}</td>`;
+  }
+  h+="</tr>";
+  t.innerHTML=h;
+  return t;
+}
+
+function dayPage(d){
+  const dk=iso(d);
+  const pg=document.createElement("div"); pg.className="page";
+  pg.dataset.date=dk;
+  const banner=state.days[dk]?.banner||"";
+  pg.innerHTML=`<div class="phead">
+      <div class="side"></div>
+      <div class="mid">
+        <div class="p-title">🌈 ${fmt(d)} (${DOW[dowIdx(d)]}) 🌈</div>
+        ${banner?`<div class="p-banner">${esc(banner)}</div>`:""}
+      </div>
+      <div class="side stamp"><div class="lbl">🌟 다 하면 도장 꽝!</div><div class="box"></div></div>
+    </div>`;
+  if(state.makeWeekly) pg.appendChild(weeklyTable(d));
+
+  const items=itemsForDate(d);
+  const bottom=document.createElement("div"); bottom.className="bottom";
+
+  const left=document.createElement("div"); left.className="bcol left";
+  left.innerHTML=`<h4>🕐 오늘의 시간</h4>`;
+  const timed=items.filter(it=>it.time).sort((a,b)=>a.time.localeCompare(b.time));
+  const tl=document.createElement("div"); tl.className="timeline";
+  if(timed.length){
+    timed.forEach((it,i)=>{ const c=cardById(it.cardId); if(!c) return;
+      const r=document.createElement("div"); r.className="tl";
+      r.style.borderColor=RBD[i%7];
+      r.innerHTML=`<span class="tm">${it.time}</span><span>${c.emoji}</span><span>${esc(c.name)}</span>`;
+      tl.appendChild(r); });
+  } else {
+    tl.innerHTML=`<div class="empty-note">오늘은 정해진 시간이 없어요! 하고 싶은 것부터 해요 🌈</div>`;
+  }
+  left.appendChild(tl);
+
+  const right=document.createElement("div"); right.className="bcol right";
+  right.innerHTML=`<h4>🌸 오늘의 할 일</h4>`;
+  const cl=document.createElement("div"); cl.className="cl";
+  if(items.length){
+    items.forEach((it,i)=>{ const c=cardById(it.cardId); if(!c) return;
+      const r=document.createElement("div"); r.className="cli";
+      r.innerHTML=`<div class="box" style="border-color:${RBD[i%7]}"></div>
+        <div class="txt">${c.emoji} ${esc(c.name)}${it.time?` <b style="color:#B5457A">(${it.time})</b>`:""}</div>
+        <span class="rm no-print" title="이 날만 빼기">✕</span>`;
+      r.querySelector(".rm").onclick=()=>{
+        if(it.src==="r"){
+          const rec=ensureDay(dk);
+          rec.hiddenRoutine=(rec.hiddenRoutine||[]).concat(it.cardId);
+        }else{
+          state.days[dk].items.splice(it.idx,1);
+        }
+        save(); renderAll();
+      };
+      cl.appendChild(r); });
+  } else {
+    cl.innerHTML=`<div class="empty-note">오늘은 할 일이 없어요! 마음껏 놀아요 🎉</div>`;
+  }
+  right.appendChild(cl);
+
+  // 이 날만 뺀 반복 일정 → 다시 넣기
+  const hid = state.days[dk]?.hiddenRoutine||[];
+  if(hid.length){
+    const bar=document.createElement("div"); bar.className="hidden-bar no-print";
+    bar.append("이 날만 뺀 반복 일정: ");
+    hid.forEach(cid=>{
+      const c=cardById(cid); if(!c) return;
+      const b=document.createElement("button");
+      b.textContent=`${c.name} 다시 넣기`;
+      b.onclick=()=>{
+        const rec=state.days[dk];
+        rec.hiddenRoutine=rec.hiddenRoutine.filter(x=>x!==cid);
+        save(); renderAll();
+      };
+      bar.appendChild(b);
+    });
+    right.appendChild(bar);
+  }
+
+  bottom.appendChild(left); bottom.appendChild(right);
+  pg.appendChild(bottom);
+  return pg;
+}
+
+function doPrint(){ renderPreview(); window.print(); }
+function resetAll(){
+  if(!confirm("모든 내용을 지우고 처음 상태로 되돌릴까요?")) return;
+  state=defaultState(); save(); renderAll(); bindOnce();
+}
+function bindOnce(){
+  inTitle.value=state.title; inStart.value=state.start; inEnd.value=state.end;
+  ckMonthly.checked=state.makeMonthly; ckWeekly.checked=state.makeWeekly; ckDaily.checked=state.makeDaily;
+  ckSat.checked=state.showSat; ckSun.checked=state.showSun;
+}
+function renderAll(){ renderCards(); renderWeek(); renderDates(); renderPreview(); if(calEditOpen) renderCalEdit(); }
+
+load();
+buildTimeOptions(pickTime);
+renderPalette();
+bindBasics();
+bindPager();
+renderAll();
+</script>
+</body>
+</html>
