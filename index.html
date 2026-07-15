@@ -168,22 +168,22 @@
     border-radius:2.5mm; padding:4mm; text-align:center;}
 
   /* 월별 달력 */
-  table.cal{width:100%; border-collapse:collapse; margin-top:3mm; table-layout:fixed;}
-  table.cal th{padding:2mm; color:#fff; font-size:22px; border:1.5px solid #fff;}
-  table.cal td{border:1.5px solid #fff; background:var(--cell); height:24.5mm; vertical-align:top;
-    padding:1mm 2mm 8mm; font-size:19px; color:#555; position:relative; overflow:hidden;}
+  table.cal{width:100%; border-collapse:collapse; margin-top:2mm; table-layout:fixed;}
+  table.cal th{padding:1.5mm; color:#fff; font-size:24px; border:1.5px solid #fff;}
+  table.cal td{border:1.5px solid #fff; background:var(--cell); height:25mm; vertical-align:top;
+    padding:1mm 2mm 8mm; font-size:21px; color:#555; position:relative; overflow:hidden;}
   .d-row{display:flex; align-items:flex-start; justify-content:space-between; gap:2mm;}
-  .d-row .d{font-size:21px; font-weight:bold; color:#333;}
-  .d-row .re-top{font-size:19px; text-align:right; min-height:5mm;}
+  .d-row .d{font-size:23px; font-weight:bold; color:#333;}
+  .d-row .re-top{font-size:21px; text-align:right; min-height:5mm;}
   .d-row .re-top.banner{color:var(--pink); font-weight:bold; word-break:keep-all;}
   table.cal td.out{background:#F5F5F5;}
   table.cal td.we{background:var(--we);}
   table.cal td div.it{margin-top:.5mm; word-break:keep-all; line-height:1.25;}
-  table.cal td div.it.day-emoji{font-size:21px;}
-  table.cal td .re-bottom{position:absolute; left:2mm; right:2mm; bottom:1.2mm; opacity:.75; font-size:19px;}
+  table.cal td div.it.day-emoji{font-size:23px;}
+  table.cal td .re-bottom{position:absolute; left:2mm; right:2mm; bottom:1.2mm; opacity:.75; font-size:21px;}
 
-  .cal-legend{margin-top:2.5mm; font-size:12px; color:#666; background:var(--cell);
-    border:1.5px dashed var(--line3); border-radius:2.5mm; padding:2mm 4mm; line-height:1.6;}
+  .cal-legend{margin-top:1.5mm; font-size:12px; color:#666; background:var(--cell);
+    border:1.5px dashed var(--line3); border-radius:2.5mm; padding:1.5mm 4mm; line-height:1.45;}
   .cal-legend b{color:var(--pink); font-size:12px;}
   .cal-legend span.pair{display:inline-block; margin-right:4mm; white-space:nowrap;}
 
@@ -796,7 +796,7 @@ function monthPage(start,end){
   }
   t.innerHTML=html; pg.appendChild(t);
   const note=document.createElement("div");
-  note.style.cssText="text-align:center;margin-top:3mm;font-size:12px;color:var(--txt);font-weight:bold";
+  note.style.cssText="text-align:center;margin-top:1.5mm;font-size:12px;color:var(--txt);font-weight:bold";
   note.textContent="📌 날짜별 일정만 글씨로 표시돼요. 매주 하는 일정은 이모지로만 살짝 보여요 (뜻은 아래 참고!)";
   pg.appendChild(note);
 
