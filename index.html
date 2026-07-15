@@ -131,56 +131,56 @@
   .phead{display:flex; align-items:flex-start; gap:2mm;}
   .phead .side{width:42mm; flex:none;}
   .phead .mid{flex:1;}
-  .p-title{text-align:center; font-size:27px; font-weight:bold; color:var(--pink); padding-top:2mm;}
-  .p-banner{text-align:center; font-size:16px; font-weight:bold; color:var(--txt); margin-top:2mm;}
+  .p-title{text-align:center; font-size:24px; font-weight:bold; color:var(--pink); padding-top:2mm;}
+  .p-banner{text-align:center; font-size:13px; font-weight:bold; color:var(--txt); margin-top:2mm;}
   .stamp{text-align:center;}
   .stamp .lbl{font-size:10px; font-weight:bold; color:var(--pink); margin-bottom:1.5mm;}
   .stamp .box{width:38mm; height:20mm; border:2.5px dashed var(--hot); border-radius:4mm; background:#fff; margin-left:auto;}
 
   table.wk{width:100%; border-collapse:collapse; margin-top:5mm; table-layout:fixed;}
-  table.wk th{padding:3mm 1mm; font-size:20px; color:#555; border:1.5px solid #fff;}
-  table.wk th .tag{display:block; font-size:15px; font-weight:normal; color:#777; margin-top:1mm;}
+  table.wk th{padding:3mm 1mm; font-size:17px; color:#555; border:1.5px solid #fff;}
+  table.wk th .tag{display:block; font-size:12px; font-weight:normal; color:#777; margin-top:1mm;}
   table.wk th.today{color:#fff; outline:3px solid var(--pink-dark); outline-offset:-3px;}
   table.wk th.today .tag{color:var(--sel);}
   table.wk td{border:1.5px solid var(--line4); background:#fff; vertical-align:middle; text-align:center;
-    padding:2mm 1mm; font-size:17px; color:#666; height:23mm; word-break:keep-all;}
+    padding:2mm 1mm; font-size:14px; color:#666; height:20mm; word-break:keep-all;}
   table.wk td.today{background:var(--sel); outline:3px solid var(--pink-dark); outline-offset:-3px;
     color:var(--txt-dark); font-weight:bold;}
   table.wk td div{margin:.6mm 0;}
 
   .bottom{display:flex; gap:5mm; margin-top:4mm;}
-  .bcol{flex:1; border:2px solid var(--line); border-radius:5mm; padding:4mm 6mm; min-height:88mm;}
+  .bcol{flex:1; border:2px solid var(--line); border-radius:5mm; padding:4mm 6mm; min-height:93mm;}
   .bcol.left{background:var(--cell);}
   .bcol.right{background:var(--cell3);}
-  .bcol h4{color:var(--pink); font-size:20px; margin-bottom:4mm;}
+  .bcol h4{color:var(--pink); font-size:17px; margin-bottom:4mm;}
   .timeline{display:flex; flex-direction:column; gap:2.5mm;}
   .timeline .tl{display:flex; align-items:center; gap:3mm; background:#fff; border:2px solid var(--r0);
-    border-radius:2.5mm; padding:2.5mm 3.5mm; font-size:19px;}
-  .timeline .tl .tm{font-weight:bold; color:var(--txt); min-width:16mm; font-size:18px;}
+    border-radius:2.5mm; padding:2.5mm 3.5mm; font-size:16px;}
+  .timeline .tl .tm{font-weight:bold; color:var(--txt); min-width:16mm; font-size:15px;}
   .timeline .tl.banner-line{border-color:var(--hot); background:var(--sel);}
   .timeline .tl.banner-line span:last-child{font-weight:bold; color:var(--txt-dark);}
   .cl{display:flex; flex-direction:column; gap:2.5mm;}
   .cl .cli{display:flex; align-items:center; gap:3mm;}
   .cl .box{width:8mm; height:8mm; border:2.5px solid var(--d0); border-radius:2mm; background:#fff; flex:none;}
   .cl .txt{flex:1; background:var(--cell2); border:1.5px solid var(--line5); border-radius:2.5mm;
-    padding:2.5mm 3.5mm; font-size:19px;}
-  .empty-note{color:var(--txt-dark); font-weight:bold; font-size:15px; background:#fff; border:2px dashed var(--line2);
+    padding:2.5mm 3.5mm; font-size:16px;}
+  .empty-note{color:var(--txt-dark); font-weight:bold; font-size:12px; background:#fff; border:2px dashed var(--line2);
     border-radius:2.5mm; padding:4mm; text-align:center;}
 
   /* 월별 달력 */
   table.cal{width:100%; border-collapse:collapse; margin-top:3mm; table-layout:fixed;}
-  table.cal th{padding:2mm; color:#fff; font-size:19px; border:1.5px solid #fff;}
-  table.cal td{border:1.5px solid #fff; background:var(--cell); height:23mm; vertical-align:top;
-    padding:1.2mm 2mm 7mm; font-size:16px; color:#555; position:relative; overflow:hidden;}
+  table.cal th{padding:2mm; color:#fff; font-size:22px; border:1.5px solid #fff;}
+  table.cal td{border:1.5px solid #fff; background:var(--cell); height:24.5mm; vertical-align:top;
+    padding:1mm 2mm 8mm; font-size:19px; color:#555; position:relative; overflow:hidden;}
   .d-row{display:flex; align-items:flex-start; justify-content:space-between; gap:2mm;}
-  .d-row .d{font-size:18px; font-weight:bold; color:#333;}
-  .d-row .re-top{font-size:16px; text-align:right; min-height:5mm;}
+  .d-row .d{font-size:21px; font-weight:bold; color:#333;}
+  .d-row .re-top{font-size:19px; text-align:right; min-height:5mm;}
   .d-row .re-top.banner{color:var(--pink); font-weight:bold; word-break:keep-all;}
   table.cal td.out{background:#F5F5F5;}
   table.cal td.we{background:var(--we);}
   table.cal td div.it{margin-top:.5mm; word-break:keep-all; line-height:1.25;}
-  table.cal td div.it.day-emoji{font-size:18px;}
-  table.cal td .re-bottom{position:absolute; left:2mm; right:2mm; bottom:1.2mm; opacity:.75; font-size:16px;}
+  table.cal td div.it.day-emoji{font-size:21px;}
+  table.cal td .re-bottom{position:absolute; left:2mm; right:2mm; bottom:1.2mm; opacity:.75; font-size:19px;}
 
   .cal-legend{margin-top:2.5mm; font-size:12px; color:#666; background:var(--cell);
     border:1.5px dashed var(--line3); border-radius:2.5mm; padding:2mm 4mm; line-height:1.6;}
