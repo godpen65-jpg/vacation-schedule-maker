@@ -4,10 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>🌈 방학 일정표 만들기</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
 <style>
+  @font-face{font-family:"SCDream"; font-weight:400; font-style:normal; font-display:swap;
+    src:url("fonts/SCDream-Regular.woff2") format("woff2");}
+  @font-face{font-family:"SCDream"; font-weight:500; font-style:normal; font-display:swap;
+    src:url("fonts/SCDream-Medium.woff2") format("woff2");}
+  @font-face{font-family:"SCDream"; font-weight:700; font-style:normal; font-display:swap;
+    src:url("fonts/SCDream-Bold.woff2") format("woff2");}
   :root{
     /* 테마 색 (기본: 핑크) — JS의 THEMES에서 통째로 바뀜 */
     --pink:#E91E7C; --pink-dark:#C2185B; --hot:#FF4D9D;
@@ -26,7 +29,7 @@
   .theme-btns .tb.sel{border-color:#555; box-shadow:0 0 0 2px #fff inset;}
   *{box-sizing:border-box; margin:0; padding:0;
     -webkit-print-color-adjust:exact; print-color-adjust:exact; color-adjust:exact;}
-  body{font-family:"Jua","Malgun Gothic","맑은 고딕",sans-serif; background:var(--bg); color:#444;}
+  body{font-family:"SCDream","Malgun Gothic","맑은 고딕",sans-serif; background:var(--bg); color:#444;}
 
   /* ---------- 편집 화면 ---------- */
   .app-header{position:sticky; top:0; z-index:50; background:linear-gradient(90deg,var(--head),var(--sel));
@@ -166,18 +169,18 @@
 
   /* 월별 달력 */
   table.cal{width:100%; border-collapse:collapse; margin-top:3mm; table-layout:fixed;}
-  table.cal th{padding:2mm; color:#fff; font-size:16px; border:1.5px solid #fff;}
-  table.cal td{border:1.5px solid #fff; background:var(--cell); height:19mm; vertical-align:top;
-    padding:1.2mm 2mm 6mm; font-size:13px; color:#555; position:relative; overflow:hidden;}
+  table.cal th{padding:2mm; color:#fff; font-size:19px; border:1.5px solid #fff;}
+  table.cal td{border:1.5px solid #fff; background:var(--cell); height:23mm; vertical-align:top;
+    padding:1.2mm 2mm 7mm; font-size:16px; color:#555; position:relative; overflow:hidden;}
   .d-row{display:flex; align-items:flex-start; justify-content:space-between; gap:2mm;}
-  .d-row .d{font-size:15px; font-weight:bold; color:#333;}
-  .d-row .re-top{font-size:13px; text-align:right; min-height:5mm;}
+  .d-row .d{font-size:18px; font-weight:bold; color:#333;}
+  .d-row .re-top{font-size:16px; text-align:right; min-height:5mm;}
   .d-row .re-top.banner{color:var(--pink); font-weight:bold; word-break:keep-all;}
   table.cal td.out{background:#F5F5F5;}
   table.cal td.we{background:var(--we);}
   table.cal td div.it{margin-top:.5mm; word-break:keep-all; line-height:1.25;}
-  table.cal td div.it.day-emoji{font-size:15px;}
-  table.cal td .re-bottom{position:absolute; left:2mm; right:2mm; bottom:1.2mm; opacity:.75; font-size:13px;}
+  table.cal td div.it.day-emoji{font-size:18px;}
+  table.cal td .re-bottom{position:absolute; left:2mm; right:2mm; bottom:1.2mm; opacity:.75; font-size:16px;}
 
   .cal-legend{margin-top:2.5mm; font-size:12px; color:#666; background:var(--cell);
     border:1.5px dashed var(--line3); border-radius:2.5mm; padding:2mm 4mm; line-height:1.6;}
