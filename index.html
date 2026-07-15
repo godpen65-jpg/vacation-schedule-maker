@@ -154,6 +154,8 @@
   .timeline .tl{display:flex; align-items:center; gap:3mm; background:#fff; border:2px solid var(--r0);
     border-radius:2.5mm; padding:2.5mm 3.5mm; font-size:16px;}
   .timeline .tl .tm{font-weight:bold; color:var(--txt); min-width:16mm; font-size:15px;}
+  .timeline .tl.banner-line{border-color:var(--hot); background:var(--sel);}
+  .timeline .tl.banner-line span:last-child{font-weight:bold; color:var(--txt-dark);}
   .cl{display:flex; flex-direction:column; gap:2.5mm;}
   .cl .cli{display:flex; align-items:center; gap:3mm;}
   .cl .box{width:8mm; height:8mm; border:2.5px solid var(--d0); border-radius:2mm; background:#fff; flex:none;}
@@ -861,6 +863,11 @@ function dayPage(d){
   left.innerHTML=`<h4>🕐 오늘의 시간</h4>`;
   const timed=items.filter(it=>it.time).sort((a,b)=>a.time.localeCompare(b.time));
   const tl=document.createElement("div"); tl.className="timeline";
+  if(banner){
+    const b=document.createElement("div"); b.className="tl banner-line";
+    b.innerHTML=`<span class="tm">📌</span><span>${esc(banner)}</span>`;
+    tl.appendChild(b);
+  }
   if(timed.length){
     timed.forEach((it,i)=>{ const c=cardById(it.cardId); if(!c) return;
       const r=document.createElement("div"); r.className="tl";
@@ -868,7 +875,9 @@ function dayPage(d){
       r.innerHTML=`<span class="tm">${it.time}</span><span>${c.emoji}</span><span>${esc(c.name)}</span>`;
       tl.appendChild(r); });
   } else {
-    tl.innerHTML=`<div class="empty-note">${esc(state.emptyTimeMsg||"오늘의 일정을 잘 지켜보자!")}</div>`;
+    const note=document.createElement("div"); note.className="empty-note";
+    note.textContent = state.emptyTimeMsg||"오늘의 일정을 잘 지켜보자!";
+    tl.appendChild(note);
   }
   left.appendChild(tl);
 
