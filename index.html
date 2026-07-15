@@ -293,7 +293,7 @@
       <b style="color:var(--txt); font-size:13px">새 카드 추가</b>
       <div class="emoji-palette" id="emojiPalette"></div>
       <div class="row">
-        <input type="text" id="inEmoji" style="width:70px; text-align:center; font-size:18px" placeholder="이모지">
+        <input type="text" id="inEmoji" style="width:90px; text-align:center; font-size:16px" placeholder="이모지">
         <input type="text" id="inCardName" style="width:220px" placeholder="일정 이름 (예: 피아노 학원)">
         <button class="btn-main" onclick="addCard()">+ 카드 추가</button>
       </div>
@@ -863,8 +863,9 @@ function dayPage(d){
   const bottom=document.createElement("div"); bottom.className="bottom";
 
   const left=document.createElement("div"); left.className="bcol left";
-  left.innerHTML=`<h4>🕐 오늘의 시간</h4>`;
-  const timed=items.filter(it=>it.time).sort((a,b)=>a.time.localeCompare(b.time));
+  left.innerHTML=`<h4>🕐 오늘의 일정</h4>`;
+  // 주간(반복) 일정은 '할일'이라 시간이 있어도 여기(오늘의 일정)엔 안 넣고, 날짜별로 등록한 일정만 넣음
+  const timed=items.filter(it=>it.time && it.src==="d").sort((a,b)=>a.time.localeCompare(b.time));
   const tl=document.createElement("div"); tl.className="timeline";
   if(banner){
     const b=document.createElement("div"); b.className="tl banner-line";
