@@ -693,7 +693,7 @@ function esc(s){ return String(s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;
 
 function renderPreview(){
   const area=printArea; area.innerHTML=""; calArea.innerHTML="";
-  // 월별 편집 달력은 "월별 달력 만들기" 체크와 무관하게 항상 보여줘야 함 (인쇄 페이지 생성 여부만 그 체크로 결정)
+  monthlyPreviewWrap.style.display = state.makeMonthly ? "" : "none";
   dailyPreviewWrap.style.display = state.makeDaily ? "" : "none";
   if(!state.start||!state.end) return;
   const start=pd(state.start), end=pd(state.end);
