@@ -113,6 +113,10 @@
   .preview-block h2{color:var(--pink); font-size:17px; margin-bottom:10px;}
   .page{width:297mm; min-height:210mm; background:#fff; margin:0 auto 14px; padding:8mm 10mm;
     box-shadow:0 3px 14px rgba(0,0,0,.12); position:relative; overflow:hidden;}
+  /* 월별 달력 페이지는 세로로 꽉 채우기 (표가 남는 공간을 늘려 칸을 크게) */
+  .page.calpage{display:flex; flex-direction:column;}
+  .page.calpage > table.cal{flex:1 1 auto; height:100%;}
+  .page.calpage > table.cal tr:first-child{height:12mm;}
   @media screen{
     .page.hide-screen{display:none;}
     #calArea{display:none;}  /* 화면에서는 수정용 달력을 보여주고, 인쇄용 달력은 인쇄할 때만 */
@@ -174,18 +178,18 @@
 
   /* 월별 달력 */
   table.cal{width:100%; border-collapse:collapse; margin-top:1.5mm; table-layout:fixed;}
-  table.cal th{padding:1.5mm; color:#fff; font-size:18px; border:1.5px solid #fff;}
+  table.cal th{padding:1.5mm; color:#fff; font-size:20px; border:1.5px solid #fff;}
   table.cal td{border:1.5px solid #fff; background:var(--cell); height:19mm; vertical-align:top;
-    padding:1mm 2mm 6mm; font-size:15px; color:#555; position:relative; overflow:hidden;}
+    padding:1.5mm 2.5mm 7mm; font-size:17px; color:#555; position:relative; overflow:hidden;}
   .d-row{display:flex; align-items:flex-start; justify-content:space-between; gap:2mm;}
-  .d-row .d{font-size:17px; font-weight:bold; color:#333;}
-  .d-row .re-top{font-size:15px; text-align:right; min-height:4mm;}
+  .d-row .d{font-size:19px; font-weight:bold; color:#333;}
+  .d-row .re-top{font-size:16px; text-align:right; min-height:4mm;}
   .d-row .re-top.banner{color:var(--pink); font-weight:bold; word-break:keep-all;}
   table.cal td.out{background:#F5F5F5;}
   table.cal td.we{background:var(--we);}
-  table.cal td div.it{margin-top:.5mm; word-break:keep-all; line-height:1.25;}
-  table.cal td div.it.day-emoji{font-size:17px;}
-  table.cal td .re-bottom{position:absolute; left:2mm; right:2mm; bottom:1.2mm; opacity:.75; font-size:15px;}
+  table.cal td div.it{margin-top:1mm; word-break:keep-all; line-height:1.3;}
+  table.cal td div.it.day-emoji{font-size:19px;}
+  table.cal td .re-bottom{position:absolute; left:2.5mm; right:2.5mm; bottom:1.5mm; opacity:.8; font-size:19px;}
 
   .cal-legend{margin-top:1.5mm; font-size:12px; color:#666; background:var(--cell);
     border:1.5px dashed var(--line3); border-radius:2.5mm; padding:1.5mm 4mm; line-height:1.45;}
@@ -780,7 +784,7 @@ function bindPager(){
 }
 
 function monthPage(start,end){
-  const pg=document.createElement("div"); pg.className="page";
+  const pg=document.createElement("div"); pg.className="page calpage";
   pg.dataset.date="calendar";
   pg.innerHTML=`<div class="p-title">🌈 ${esc(state.title)} 🌈</div>
     <div class="p-banner">${fmt(start)} (${DOW[dowIdx(start)]}) ~ ${fmt(end)} (${DOW[dowIdx(end)]})</div>`;
