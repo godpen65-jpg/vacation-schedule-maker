@@ -955,7 +955,22 @@ function dayPage(d){
   return pg;
 }
 
-function doPrint(){ renderPreview(); window.print(); }
+function isInAppBrowser(){
+  const ua=(navigator.userAgent||"").toLowerCase();
+  return /kakaotalk|naver|line\/|instagram|fbav|fban|fb_iab|daumapps|everytimeapp|band|snapchat|whatsapp/.test(ua);
+}
+function doPrint(){
+  // 앱 안(카톡·인스타 등)에서 열면 인쇄가 막혀요 → 진짜 브라우저로 열도록 안내
+  if(isInAppBrowser()){
+    alert("지금은 앱 안에서 열려 있어서 인쇄가 안 돼요 😢\n\n오른쪽 위 메뉴(⋮ 또는 공유)에서 \"다른 브라우저로 열기\" 또는 \"Chrome/Safari로 열기\"를 눌러 다시 열어주세요.\n그다음 인쇄하기를 누르면 PDF 저장·인쇄가 돼요!");
+    return;
+  }
+  renderPreview();  // 버튼을 누른 그 순간(사용자 동작 안)에서 바로 인쇄창을 열어야 모바일에서도 열려요
+  try{ window.print(); }
+  catch(e){
+    alert("인쇄창을 열지 못했어요. 브라우저 메뉴에서 \"인쇄\" 또는 \"공유 → 인쇄\"를 눌러주세요.");
+  }
+}
 function resetAll(){
   if(!confirm("모든 내용을 지우고 처음 상태로 되돌릴까요?")) return;
   state=defaultState(); state.theme="pink"; save();
