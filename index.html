@@ -237,8 +237,11 @@
 <header class="app-header no-print">
   <h1>🌈 방학 일정표 만들기</h1>
   <div class="spacer"></div>
+  <button class="btn-ghost" onclick="exportData()">💾 백업 저장</button>
+  <button class="btn-ghost" onclick="importData()">📂 불러오기</button>
   <button class="btn-ghost" onclick="resetAll()">전체 지우기</button>
   <button class="btn-main" onclick="doPrint()">🖨️ 인쇄하기</button>
+  <input type="file" id="importFile" accept="application/json,.json" style="display:none">
 </header>
 
 <main>
@@ -953,6 +956,57 @@ function dayPage(d){
   bottom.appendChild(left); bottom.appendChild(right);
   pg.appendChild(bottom);
   return pg;
+}
+
+// ---------- 백업 저장 / 불러오기 ----------
+function exportData(){
+  try{
+    const data=JSON.stringify(state, null, 2);
+    const blob=new Blob([data], {type:"application/json"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    const today=new Date();
+    const stamp=today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0");
+    a.href=url;
+    a.download=`방학일정표_백업_${stamp}.json`;
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
+    alert("백업 파일을 저장했어요! 💾\n이 파일을 잘 보관해두면, 다른 폰·컴퓨터에서도 '불러오기'로 그대로 살릴 수 있어요.");
+  }catch(e){
+    alert("백업 저장에 실패했어요: "+e.message);
+  }
+}
+function importData(){
+  const inp=document.getElementById("importFile");
+  inp.value="";
+  inp.onchange=function(){
+    const file=inp.files&&inp.files[0];
+    if(!file) return;
+    const reader=new FileReader();
+    reader.onload=function(){
+      try{
+        const loaded=JSON.parse(reader.result);
+        if(!loaded || !Array.isArray(loaded.cards) || !loaded.routine){
+          alert("이 파일은 방학 일정표 백업 파일이 아닌 것 같아요. 다른 파일을 골라주세요.");
+          return;
+        }
+        if(!confirm("지금 저장된 내용을 이 백업 파일 내용으로 바꿀까요?\n(지금 화면의 내용은 사라져요)")) return;
+        state=loaded;
+        if(state.showSat===undefined) state.showSat=true;
+        if(state.showSun===undefined) state.showSun=true;
+        if(!state.theme) state.theme="pink";
+        if(!state.emptyTimeMsg) state.emptyTimeMsg="오늘의 일정을 잘 지켜보자!";
+        save();
+        applyTheme(state.theme); renderThemeBtns();
+        bindOnce(); renderAll();
+        alert("불러오기 완료! 🎉");
+      }catch(e){
+        alert("파일을 읽지 못했어요: "+e.message);
+      }
+    };
+    reader.readAsText(file, "utf-8");
+  };
+  inp.click();
 }
 
 function isInAppBrowser(){
