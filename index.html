@@ -349,12 +349,6 @@
     <h3 id="modalTitle">추가하기</h3>
 
     <div class="row2">
-      <b style="font-size:13px; color:var(--txt)">무엇을?</b>
-      <label class="kindopt"><input type="radio" name="pickKind" value="schedule" checked> 🕐 오늘의 일정</label>
-      <label class="kindopt"><input type="radio" name="pickKind" value="todo"> 🌸 오늘의 할 일</label>
-    </div>
-
-    <div class="row2">
       <b style="font-size:13px; color:var(--txt)">언제?</b>
       <label class="kindopt"><input type="radio" name="pickRepeat" value="weekly" checked onchange="onRepeatChange()"> 🔁 매주 반복</label>
       <label class="kindopt"><input type="radio" name="pickRepeat" value="once" onchange="onRepeatChange()"> 📅 한 번만</label>
@@ -577,7 +571,7 @@ function buildTimeOptions(sel){
 }
 
 // ---------- 모달 (일정/할일 추가) ----------
-let pickSel=null, pickWeekdays=new Set();
+let pickSel=null, pickWeekdays=new Set(), pickKind="schedule";
 function buildPickCards(){
   pickCards.innerHTML="";
   state.cards.forEach(c=>{
@@ -610,17 +604,17 @@ function openModalCommon(){
 }
 function openAdd(kind){
   openModalCommon();
-  document.querySelector(`input[name="pickKind"][value="${kind}"]`).checked=true;
+  pickKind=kind;
   document.querySelector('input[name="pickRepeat"][value="weekly"]').checked=true;
   modalTitle.textContent = kind==="todo" ? "🌸 할 일 추가" : "🕐 일정 추가";
   onRepeatChange();
 }
-function openCalDay(dk){  // 월별 달력 칸 클릭 → 그 날짜에 한 번만 추가
+function openCalDay(dk){  // 월별 달력 칸 클릭 → 그 날짜에 한 번만 (일정으로) 추가
   openModalCommon();
-  document.querySelector('input[name="pickKind"][value="schedule"]').checked=true;
+  pickKind="schedule";
   document.querySelector('input[name="pickRepeat"][value="once"]').checked=true;
   const d=pd(dk);
-  modalTitle.textContent = `${fmt(d)} (${DOW[dowIdx(d)]}) 추가`;
+  modalTitle.textContent = `${fmt(d)} (${DOW[dowIdx(d)]}) 일정 추가`;
   onRepeatChange();
   inDayDate.value=dk;
   inDayBanner.value = state.days[dk]?.banner || "";
@@ -628,7 +622,7 @@ function openCalDay(dk){  // 월별 달력 칸 클릭 → 그 날짜에 한 번�
 function closePicker(){ modalBg.classList.remove("on"); }
 function confirmPicker(){
   if(pickSel==null){ alert("카드를 하나 골라주세요!"); return; }
-  const kind=document.querySelector('input[name="pickKind"]:checked').value;
+  const kind=pickKind;
   const repeat=document.querySelector('input[name="pickRepeat"]:checked').value;
   const time=pickTime.value;
   if(repeat==="weekly"){
