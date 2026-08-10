@@ -224,6 +224,7 @@
   #calEditBox td.we{background:var(--we);}
   #calEditBox td .d-row .d{font-size:12px; font-weight:bold; color:#333;}
   #calEditBox td .d-row .re-top{font-size:12px;}
+  #calEditBox td .day-emoji{font-size:14px; margin-top:3px;}
   #calEditBox td .re-bottom{position:absolute; left:6px; right:6px; bottom:4px; opacity:.7; font-size:12px;}
   #calEditBox td .ci-wrap{display:flex; flex-wrap:wrap; gap:3px; margin-top:3px;}
   #calEditBox td .ci{display:inline-flex; align-items:center; gap:2px;
@@ -706,25 +707,14 @@ function renderCalEdit(){
         if(inRange){
           const dk=iso(d);
           const rec=state.days[dk];
-          const hid=rec?.hiddenRoutine||[];
-          const remojis=state.routine[i].filter(it=>!hid.includes(it.cardId))
-            .map(it=>cardById(it.cardId)?.emoji).filter(Boolean).join(" ");
+          // 일정은 위, 할일은 아래 (인쇄 달력과 동일)
+          const its=itemsForDate(d);
+          const schedEmojis=its.filter(it=>kindOf(it)==="schedule").map(it=>cardById(it.cardId)?.emoji).filter(Boolean).join(" ");
+          const todoEmojis =its.filter(it=>kindOf(it)==="todo").map(it=>cardById(it.cardId)?.emoji).filter(Boolean).join(" ");
           let html=`<div class="d-row"><span class="d">${fmt(d)}</span><span class="re-top banner">${rec?.banner?esc(rec.banner):""}</span></div>`;
-          if(remojis) html+=`<div class="re-bottom">${remojis}</div>`;
+          if(schedEmojis) html+=`<div class="day-emoji">${schedEmojis}</div>`;
+          if(todoEmojis) html+=`<div class="re-bottom">${todoEmojis}</div>`;
           td.innerHTML=html;
-          if(rec?.items?.length){
-            const wrap=document.createElement("div"); wrap.className="ci-wrap";
-            rec.items.forEach((it,idx)=>{
-              const c=cardById(it.cardId); if(!c) return;
-              const ci=document.createElement("span"); ci.className="ci";
-              ci.title=c.name+(it.time?` (${it.time})`:"");
-              ci.innerHTML=`<span>${c.emoji}</span><span class="x">✕</span>`;
-              ci.querySelector(".x").onclick=(ev)=>{ ev.stopPropagation();
-                rec.items.splice(idx,1); save(); renderAll(); };
-              wrap.appendChild(ci);
-            });
-            td.appendChild(wrap);
-          }
           td.onclick=()=>openCalDay(dk);
         }
         tr.appendChild(td);
@@ -846,14 +836,13 @@ function monthPage(start,end){
         let cell="";
         if(inRange){
           const rec=state.days[iso(cur)];
-          const hid=rec?.hiddenRoutine||[];
-          const remojis=state.routine[i].filter(it=>!hid.includes(it.cardId))
-            .map(it=>cardById(it.cardId)?.emoji).filter(Boolean).join(" ");
-          // 오른쪽 위는 '한 마디' 전용 (없으면 빈칸), 날짜별 일정은 이모지만, 반복 이모지는 칸 아래쪽
+          // 일정은 칸 위, 할일은 칸 아래 (반복·한번 상관없이 종류로 구분)
+          const its=itemsForDate(cur);
+          const schedEmojis=its.filter(it=>kindOf(it)==="schedule").map(it=>cardById(it.cardId)?.emoji).filter(Boolean).join(" ");
+          const todoEmojis =its.filter(it=>kindOf(it)==="todo").map(it=>cardById(it.cardId)?.emoji).filter(Boolean).join(" ");
           cell=`<div class="d-row"><span class="d">${fmt(cur)}</span><span class="re-top banner">${rec?.banner?esc(rec.banner):""}</span></div>`;
-          const dayEmojis=(rec?.items||[]).map(it=>cardById(it.cardId)?.emoji).filter(Boolean).join(" ");
-          if(dayEmojis) cell+=`<div class="it day-emoji">${dayEmojis}</div>`;
-          if(remojis) cell+=`<div class="re-bottom">${remojis}</div>`;
+          if(schedEmojis) cell+=`<div class="it day-emoji">${schedEmojis}</div>`;
+          if(todoEmojis) cell+=`<div class="re-bottom">${todoEmojis}</div>`;
         }
         html+=`<td class="${cls}">${cell}</td>`;
       }
