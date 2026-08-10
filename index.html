@@ -719,6 +719,15 @@ function itemsForDate(d){
   const daily = (rec?.items||[]).map((it,idx)=>({...it, src:"d", idx}));
   return daily.concat(routine);
 }
+function removeItemForDay(dk, it){
+  if(it.src==="r"){
+    const rec=ensureDay(dk);
+    rec.hiddenRoutine=(rec.hiddenRoutine||[]).concat(it.cardId);
+  }else{
+    state.days[dk].items.splice(it.idx,1);
+  }
+  save(); renderAll();
+}
 function esc(s){ return String(s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
 
 function renderPreview(){
@@ -859,7 +868,7 @@ function weeklyTable(today){
     const inRange = d>=pd(state.start)&&d<=pd(state.end);
     let cell="";
     if(inRange){
-      itemsForDate(d).slice(0,4).forEach(it=>{ const c=cardById(it.cardId);
+      itemsForDate(d).forEach(it=>{ const c=cardById(it.cardId);
         if(c) cell+=`<div>${esc(c.name)}</div>`; });
     } else cell=`<div style="color:#ccc">-</div>`;
     h+=`<td class="${isT?"today":""}">${cell}</td>`;
@@ -889,8 +898,8 @@ function dayPage(d){
 
   const left=document.createElement("div"); left.className="bcol left";
   left.innerHTML=`<h4>🕐 오늘의 일정</h4>`;
-  // 주간(반복) 일정은 '할일'이라 시간이 있어도 여기(오늘의 일정)엔 안 넣고, 날짜별로 등록한 일정만 넣음
-  const timed=items.filter(it=>it.time && it.src==="d").sort((a,b)=>a.time.localeCompare(b.time));
+  // 시간이 있는 건 '일정'(학원 등) — 반복이든 날짜별이든 모두 시간순으로 여기에
+  const timed=items.filter(it=>it.time).sort((a,b)=>a.time.localeCompare(b.time));
   const tl=document.createElement("div"); tl.className="timeline";
   if(banner){
     const b=document.createElement("div"); b.className="tl banner-line";
@@ -901,7 +910,9 @@ function dayPage(d){
     timed.forEach((it,i)=>{ const c=cardById(it.cardId); if(!c) return;
       const r=document.createElement("div"); r.className="tl";
       r.style.borderColor=RBD[i%7];
-      r.innerHTML=`<span class="tm">${it.time}</span><span>${c.emoji}</span><span>${esc(c.name)}</span>`;
+      r.innerHTML=`<span class="tm">${it.time}</span><span>${c.emoji}</span><span>${esc(c.name)}</span>`+
+        `<span class="rm no-print" title="이 날만 빼기">✕</span>`;
+      r.querySelector(".rm").onclick=()=>removeItemForDay(dk, it);
       tl.appendChild(r); });
   } else {
     const note=document.createElement("div"); note.className="empty-note";
@@ -913,21 +924,14 @@ function dayPage(d){
   const right=document.createElement("div"); right.className="bcol right";
   right.innerHTML=`<h4>🌸 오늘의 할 일</h4>`;
   const cl=document.createElement("div"); cl.className="cl";
-  if(items.length){
-    items.forEach((it,i)=>{ const c=cardById(it.cardId); if(!c) return;
+  const todos=items.filter(it=>!it.time);  // 시간 없는 건 '할일'(숙제 개념)
+  if(todos.length){
+    todos.forEach((it,i)=>{ const c=cardById(it.cardId); if(!c) return;
       const r=document.createElement("div"); r.className="cli";
       r.innerHTML=`<div class="box" style="border-color:${RBD[i%7]}"></div>
-        <div class="txt">${c.emoji} ${esc(c.name)}${it.time?` <b style="color:var(--txt)">(${it.time})</b>`:""}</div>
+        <div class="txt">${c.emoji} ${esc(c.name)}</div>
         <span class="rm no-print" title="이 날만 빼기">✕</span>`;
-      r.querySelector(".rm").onclick=()=>{
-        if(it.src==="r"){
-          const rec=ensureDay(dk);
-          rec.hiddenRoutine=(rec.hiddenRoutine||[]).concat(it.cardId);
-        }else{
-          state.days[dk].items.splice(it.idx,1);
-        }
-        save(); renderAll();
-      };
+      r.querySelector(".rm").onclick=()=>removeItemForDay(dk, it);
       cl.appendChild(r); });
   } else {
     cl.innerHTML=`<div class="empty-note">오늘은 할 일이 없어요! 마음껏 놀아요 🎉</div>`;
