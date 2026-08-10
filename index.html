@@ -563,9 +563,9 @@ function addCard(){
 // ---------- 시간 선택 ----------
 function buildTimeOptions(sel){
   sel.innerHTML = `<option value="">시간 없음</option>`;
-  for(let h=7; h<=22; h++) for(const m of ["00","30"]){
-    if(h===22 && m==="30") continue;
-    const t = String(h).padStart(2,"0")+":"+m;
+  for(let h=7; h<=22; h++) for(let m=0; m<60; m+=10){
+    if(h===22 && m>0) continue;
+    const t = String(h).padStart(2,"0")+":"+String(m).padStart(2,"0");
     sel.innerHTML += `<option value="${t}">${t}</option>`;
   }
 }
