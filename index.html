@@ -105,6 +105,9 @@
   .pick-cards{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:14px;}
   .pick-cards .card{cursor:pointer;}
   .pick-cards .card.sel{border-color:var(--hot); background:var(--sel); color:var(--txt-dark);}
+  .kindopt{display:inline-flex; align-items:center; gap:5px; font-size:14px; font-weight:bold; color:var(--txt-dark);
+    background:var(--soft); padding:7px 12px; border-radius:10px; cursor:pointer;}
+  .kindopt input{width:16px; height:16px; accent-color:var(--pink);}
   .modal .row2{display:flex; gap:10px; align-items:center; margin-bottom:16px;}
   .modal-btns{display:flex; gap:10px; justify-content:flex-end;}
 
@@ -275,7 +278,7 @@
   </section>
 
   <section class="panel no-print">
-    <h2>② 날짜별 일정 (특별한 날)</h2>
+    <h2>② 한 번만 (특정 날짜에 추가)</h2>
     <div class="day-editor">
       <label class="fld">날짜 <input type="date" id="inDayDate"></label>
       <label class="fld">그날의 한 마디 (선택)
@@ -285,7 +288,7 @@
       <button class="btn-ghost" onclick="saveBannerOnly()">한 마디만 저장</button>
     </div>
     <div class="datelist" id="dateList"></div>
-    <p class="hint">여행, 학교 프로그램, 특강처럼 특정 날짜에만 있는 일정을 넣어요. 월별 달력에는 이 일정들이 표시돼요!</p>
+    <p class="hint">여행·특강처럼 <b>그 날 하루만</b> 있는 걸 넣어요. 추가할 때 <b>오늘의 일정 / 오늘의 할 일</b> 중에 고를 수 있어요.</p>
   </section>
 
   <section id="monthlyPreviewWrap" class="preview-block">
@@ -314,9 +317,9 @@
   </section>
 
   <section class="panel no-print">
-    <h2>④ 주간 일정 (매주 반복되는 것)</h2>
+    <h2>④ 매주 반복 (요일마다 추가)</h2>
     <div class="week-grid" id="weekGrid"></div>
-    <p class="hint">요일 아래 <b>+ 추가</b>를 누르고 카드를 고르면 돼요. 시간은 30분 단위로 고를 수 있어요.</p>
+    <p class="hint">요일 아래 <b>+ 추가</b> → <b>매주 그 요일마다</b> 똑같이 들어가요. 추가할 때 <b>오늘의 일정 / 오늘의 할 일</b> 중에 고를 수 있어요.</p>
   </section>
 
   <section id="dailyPreviewWrap" class="preview-block">
@@ -338,9 +341,14 @@
     <h3 id="modalTitle">일정 고르기</h3>
     <div class="pick-cards" id="pickCards"></div>
     <div class="row2">
+      <b style="font-size:13px; color:var(--txt)">어디에?</b>
+      <label class="kindopt"><input type="radio" name="pickKind" value="schedule" checked> 🕐 오늘의 일정 (학원 등)</label>
+      <label class="kindopt"><input type="radio" name="pickKind" value="todo"> 🌸 오늘의 할 일 (숙제 등)</label>
+    </div>
+    <div class="row2">
       <b style="font-size:13px; color:var(--txt)">시간</b>
       <select id="pickTime"></select>
-      <span class="hint">시간이 없으면 "시간 없음" 그대로 두세요.</span>
+      <span class="hint">시간 없어도 돼요 ("시간 없음" 그대로).</span>
     </div>
     <div class="modal-btns">
       <button class="btn-ghost" onclick="closePicker()">취소</button>
@@ -551,12 +559,14 @@ function openPicker(ctx,title){
     pickCards.appendChild(el);
   });
   pickTime.value="";
+  document.querySelector('input[name="pickKind"][value="schedule"]').checked=true;
   modalBg.classList.add("on");
 }
 function closePicker(){ modalBg.classList.remove("on"); }
 function confirmPicker(){
   if(pickSel==null){ alert("카드를 하나 골라주세요!"); return; }
-  const item={cardId:pickSel, time:pickTime.value};
+  const kind=document.querySelector('input[name="pickKind"]:checked').value;
+  const item={cardId:pickSel, time:pickTime.value, kind};
   if(pickCtx.type==="routine"){ state.routine[pickCtx.dow].push(item); }
   else{
     const d=pickCtx.date;
@@ -719,6 +729,8 @@ function itemsForDate(d){
   const daily = (rec?.items||[]).map((it,idx)=>({...it, src:"d", idx}));
   return daily.concat(routine);
 }
+// 항목이 '일정'인지 '할일'인지 (옛 데이터는 시간 있으면 일정으로 간주)
+function kindOf(it){ return it.kind || (it.time ? "schedule" : "todo"); }
 function removeItemForDay(dk, it){
   if(it.src==="r"){
     const rec=ensureDay(dk);
@@ -898,8 +910,9 @@ function dayPage(d){
 
   const left=document.createElement("div"); left.className="bcol left";
   left.innerHTML=`<h4>🕐 오늘의 일정</h4>`;
-  // 시간이 있는 건 '일정'(학원 등) — 반복이든 날짜별이든 모두 시간순으로 여기에
-  const timed=items.filter(it=>it.time).sort((a,b)=>a.time.localeCompare(b.time));
+  // '일정'으로 넣은 것만 여기에 (시간 있으면 시간순, 없으면 뒤로)
+  const timed=items.filter(it=>kindOf(it)==="schedule")
+    .sort((a,b)=>(a.time||"99").localeCompare(b.time||"99"));
   const tl=document.createElement("div"); tl.className="timeline";
   if(banner){
     const b=document.createElement("div"); b.className="tl banner-line";
@@ -910,7 +923,7 @@ function dayPage(d){
     timed.forEach((it,i)=>{ const c=cardById(it.cardId); if(!c) return;
       const r=document.createElement("div"); r.className="tl";
       r.style.borderColor=RBD[i%7];
-      r.innerHTML=`<span class="tm">${it.time}</span><span>${c.emoji}</span><span>${esc(c.name)}</span>`+
+      r.innerHTML=`<span class="tm">${it.time||"·"}</span><span>${c.emoji}</span><span>${esc(c.name)}</span>`+
         `<span class="rm no-print" title="이 날만 빼기">✕</span>`;
       r.querySelector(".rm").onclick=()=>removeItemForDay(dk, it);
       tl.appendChild(r); });
@@ -924,12 +937,12 @@ function dayPage(d){
   const right=document.createElement("div"); right.className="bcol right";
   right.innerHTML=`<h4>🌸 오늘의 할 일</h4>`;
   const cl=document.createElement("div"); cl.className="cl";
-  const todos=items.filter(it=>!it.time);  // 시간 없는 건 '할일'(숙제 개념)
+  const todos=items.filter(it=>kindOf(it)==="todo");  // '할일'로 넣은 것만
   if(todos.length){
     todos.forEach((it,i)=>{ const c=cardById(it.cardId); if(!c) return;
       const r=document.createElement("div"); r.className="cli";
       r.innerHTML=`<div class="box" style="border-color:${RBD[i%7]}"></div>
-        <div class="txt">${c.emoji} ${esc(c.name)}</div>
+        <div class="txt">${c.emoji} ${esc(c.name)}${it.time?` <b style="color:var(--txt)">(${it.time})</b>`:""}</div>
         <span class="rm no-print" title="이 날만 빼기">✕</span>`;
       r.querySelector(".rm").onclick=()=>removeItemForDay(dk, it);
       cl.appendChild(r); });
