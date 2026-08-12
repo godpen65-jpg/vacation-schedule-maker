@@ -1019,9 +1019,10 @@ async function saveWeekJPG(){
     if(line) out.push(line);
     return out.length?out:[""];
   };
+  // 첫 줄 = 시간 + 이모지, 그다음 줄부터 = 이름
   const blocks=lists.map(l=>l.map(it=>{
-    const c=cardById(it.cardId);
-    return c ? wrap((it.time?it.time+" ":"")+c.emoji+" "+c.name) : null;
+    const c=cardById(it.cardId); if(!c) return null;
+    return [(it.time? it.time+" ":"")+c.emoji, ...wrap(c.name)];
   }).filter(Boolean));
 
   // 일정이 10개든 20개든 다 들어가게 세로 길이를 자동으로 늘림
