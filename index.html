@@ -305,8 +305,9 @@
         <button class="btn-main" onclick="addCard()">+ 카드 추가</button>
       </div>
       <p class="hint">이모지 + 이름으로 카드를 만들어두면, 아래에서 클릭으로 골라 넣을 수 있어요.
-        주간표 사진은 <b>한 줄로 나와요</b>. 이름은 <b>한글 9자 이내</b>로 짧게 써 주세요
-        (토·일을 빼면 11~14자까지 괜찮아요).</p>
+        주간표 사진은 <b>시간과 이름이 한 줄</b>로 나와요. 이름은
+        <b>시간 있으면 7자, 없으면 10자 이내</b>로 짧게 써 주세요
+        (토·일을 빼면 8~14자까지 괜찮아요).</p>
     </div>
   </section>
 
@@ -1009,11 +1010,11 @@ async function saveWeekJPG(){
   const g=cvs.getContext("2d");
   const bodyFont=`500 ${FS}px SCDream,"Malgun Gothic",sans-serif`;
 
-  // 줄바꿈 없이: 시간 한 줄, 이름 한 줄 (길면 그릴 때 폭에 맞춰 자동으로 좁아짐)
+  // 시간과 내용을 한 줄에 (예: "17:00 랭콘어학원")
   g.font=bodyFont;
   const blocks=lists.map(l=>l.map(it=>{
     const c=cardById(it.cardId); if(!c) return null;
-    return it.time ? [it.time, c.name] : [c.name];
+    return [(it.time? it.time+" ":"")+c.name];
   }).filter(Boolean));
 
   // 일정이 10개든 20개든 다 들어가게 세로 길이를 자동으로 늘림
