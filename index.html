@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>🌈 방학 일정표 만들기</title>
+<title>🌈 일정 만들기</title>
 <style>
   @font-face{font-family:"SCDream"; font-weight:400; font-style:normal; font-display:swap;
     src:url("fonts/SCDream-Regular.woff2") format("woff2");}
@@ -253,7 +253,7 @@
 <body>
 
 <header class="app-header no-print">
-  <h1>🌈 방학 일정표 만들기</h1>
+  <h1>🌈 일정 만들기</h1>
   <div class="spacer"></div>
   <button class="btn-ghost" onclick="exportData()">💾 백업 저장</button>
   <button class="btn-ghost" onclick="importData()">📂 불러오기</button>
@@ -738,10 +738,16 @@ function itemsForDate(d){
     .filter(it=>!hidden.includes(it.cardId))
     .map(it=>({...it, src:"r"}));
   const daily = (rec?.items||[]).map((it,idx)=>({...it, src:"d", idx}));
-  return daily.concat(routine);
+  return sortItems(daily.concat(routine));
 }
 // 항목이 '일정'인지 '할일'인지 (옛 데이터는 시간 있으면 일정으로 간주)
 function kindOf(it){ return it.kind || (it.time ? "schedule" : "todo"); }
+// 정렬: 시간 있는 일정(빠른 순) → 시간 없는 일정 → 시간 있는 할일(빠른 순) → 시간 없는 할일
+function sortItems(list){
+  const rank=it=>(kindOf(it)==="schedule"?0:2)+(it.time?0:1);
+  return list.slice().sort((a,b)=>
+    (rank(a)-rank(b)) || (a.time||"").localeCompare(b.time||""));
+}
 function removeItemForDay(dk, it){
   if(it.src==="r"){
     const rec=ensureDay(dk);
@@ -995,7 +1001,7 @@ function exportData(){
     const today=new Date();
     const stamp=today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0");
     a.href=url;
-    a.download=`방학일정표_백업_${stamp}.json`;
+    a.download=`일정표_백업_${stamp}.json`;
     document.body.appendChild(a); a.click();
     setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
     alert("백업 파일을 저장했어요! 💾\n이 파일을 잘 보관해두면, 다른 폰·컴퓨터에서도 '불러오기'로 그대로 살릴 수 있어요.");
@@ -1014,7 +1020,7 @@ function importData(){
       try{
         const loaded=JSON.parse(reader.result);
         if(!loaded || !Array.isArray(loaded.cards) || !loaded.routine){
-          alert("이 파일은 방학 일정표 백업 파일이 아닌 것 같아요. 다른 파일을 골라주세요.");
+          alert("이 파일은 일정표 백업 파일이 아닌 것 같아요. 다른 파일을 골라주세요.");
           return;
         }
         if(!confirm("지금 저장된 내용을 이 백업 파일 내용으로 바꿀까요?\n(지금 화면의 내용은 사라져요)")) return;
@@ -1109,12 +1115,12 @@ renderAll();
 <button class="hlp-btn" type="button" onclick="hlpOpen()">❓ 사용법</button>
 <div class="hlp-ov" id="hlpOv"><div class="hlp-box">
 <button class="hlp-x" type="button" onclick="hlpClose()" aria-label="닫기">✕</button>
-<h2>🌈 방학 일정표 만들기 사용법</h2>
-<p class="hlp-lead">클릭 몇 번으로 우리 아이 방학 일정표를 만들고, A4로 인쇄까지 할 수 있어요.</p>
+<h2>🌈 일정 만들기 사용법</h2>
+<p class="hlp-lead">클릭 몇 번으로 우리 아이 일정표를 만들고, A4로 인쇄까지 할 수 있어요.</p>
 
 <h3>① 기본 설정</h3>
 <ul>
-  <li>제목과 <b>방학 시작일~마지막날</b>을 넣어요.</li>
+  <li>제목과 <b>시작일~마지막날</b>을 넣어요.</li>
   <li>📅 월별 달력 / 🌈 주간 일정 / 📄 하루 한 장 — <b>체크한 것만</b> 미리보기와 인쇄에 나와요.</li>
   <li>토요일·일요일 포함 여부도 체크로 뺐다 넣었다 할 수 있어요.</li>
   <li>🎨 <b>배경 색깔</b> — 핑크·하늘·노랑·연두·보라·흑백 중에 골라요. 인쇄물도 같이 바뀌어요.</li>
