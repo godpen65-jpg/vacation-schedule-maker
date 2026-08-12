@@ -258,6 +258,7 @@
   <button class="btn-ghost" onclick="exportData()">💾 백업 저장</button>
   <button class="btn-ghost" onclick="importData()">📂 불러오기</button>
   <button class="btn-ghost" onclick="resetAll()">전체 지우기</button>
+  <button class="btn-main" onclick="saveWeekJPG()">🗓️ 주간표 사진저장</button>
   <button class="btn-main" onclick="doPrint()">🖨️ 인쇄하기</button>
   <input type="file" id="importFile" accept="application/json,.json" style="display:none">
 </header>
@@ -303,7 +304,8 @@
         <input type="text" id="inCardName" style="width:220px" placeholder="일정 이름 (예: 피아노 학원)">
         <button class="btn-main" onclick="addCard()">+ 카드 추가</button>
       </div>
-      <p class="hint">이모지 + 이름으로 카드를 만들어두면, 아래에서 클릭으로 골라 넣을 수 있어요.</p>
+      <p class="hint">이모지 + 이름으로 카드를 만들어두면, 아래에서 클릭으로 골라 넣을 수 있어요.
+        이름은 <b>8글자 이내</b>가 예쁘게 나와요 (길면 자동으로 줄바꿈되거나 살짝 좁아져요).</p>
     </div>
   </section>
 
@@ -989,6 +991,78 @@ function dayPage(d){
   bottom.appendChild(left); bottom.appendChild(right);
   pg.appendChild(bottom);
   return pg;
+}
+
+// ---------- 날짜 없는 주간 시간표 → JPG 사진 저장 ----------
+async function saveWeekJPG(){
+  if(document.fonts && document.fonts.ready) await document.fonts.ready;
+  const dows=visibleDows();
+  const cs=getComputedStyle(document.documentElement);
+  const cv=(n)=>cs.getPropertyValue(n).trim();
+  const S=2, W=1800, PAD=50, TITLE_H=110, HEAD_H=80;
+  const FS=22, LINE_H=32, GAP=22, TOP_GAP=24;
+  const colW=(W-PAD*2)/dows.length;
+  const lists=dows.map(i=>sortItems(state.routine[i]||[]));
+
+  const cvs=document.createElement("canvas");
+  const g=cvs.getContext("2d");
+  const bodyFont=`500 ${FS}px SCDream,"Malgun Gothic",sans-serif`;
+
+  // 칸 너비보다 긴 이름은 잘라내지 않고 줄을 나눠서 전부 보이게
+  g.font=bodyFont;
+  const wrap=(text)=>{
+    const maxW=colW-26, out=[]; let line="";
+    for(const ch of text){
+      if(g.measureText(line+ch).width>maxW && line){ out.push(line); line=ch==="ㅤ"?"":ch; }
+      else line+=ch;
+    }
+    if(line) out.push(line);
+    return out.length?out:[""];
+  };
+  const blocks=lists.map(l=>l.map(it=>{
+    const c=cardById(it.cardId);
+    return c ? wrap((it.time?it.time+" ":"")+c.emoji+" "+c.name) : null;
+  }).filter(Boolean));
+
+  // 일정이 10개든 20개든 다 들어가게 세로 길이를 자동으로 늘림
+  const colH=blocks.map(b=>b.reduce((s,ls)=>s+ls.length*LINE_H+GAP, 0));
+  const bodyH=Math.max(300, ...colH)+TOP_GAP*2;
+  const H=PAD+TITLE_H+HEAD_H+bodyH+PAD;
+
+  cvs.width=W*S; cvs.height=H*S;
+  g.scale(S,S);
+  g.fillStyle="#fff"; g.fillRect(0,0,W,H);
+  g.textAlign="center"; g.textBaseline="middle";
+
+  g.fillStyle=cv("--pink"); g.font='bold 40px SCDream,"Malgun Gothic",sans-serif';
+  g.fillText(`🌈 ${state.title} 주간 시간표 🌈`, W/2, PAD+45, W-PAD*2);
+
+  const top=PAD+TITLE_H;
+  dows.forEach((i,n)=>{
+    const x=PAD+n*colW;
+    g.fillStyle=RB[i]; g.fillRect(x, top, colW, HEAD_H);
+    g.fillStyle="#444"; g.font='bold 30px SCDream,"Malgun Gothic",sans-serif';
+    g.fillText(DOW[i], x+colW/2, top+HEAD_H/2, colW-16);
+    g.strokeStyle=cv("--line4"); g.lineWidth=2;
+    g.strokeRect(x, top+HEAD_H, colW, bodyH);
+
+    g.fillStyle=cv("--txt-dark"); g.font=bodyFont;
+    let y=top+HEAD_H+TOP_GAP;
+    blocks[n].forEach(lines=>{
+      lines.forEach(ln=>{ g.fillText(ln, x+colW/2, y+LINE_H/2, colW-26); y+=LINE_H; });
+      y+=GAP;
+    });
+  });
+
+  cvs.toBlob(blob=>{
+    if(!blob){ alert("사진 저장에 실패했어요 😢"); return; }
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url; a.download="주간시간표.jpg";
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
+    alert("주간 시간표를 사진(JPG)으로 저장했어요! 🗓️\n날짜 없이 요일별 일정만 담겨 있어요.");
+  }, "image/jpeg", 0.95);
 }
 
 // ---------- 백업 저장 / 불러오기 ----------
